@@ -78,6 +78,80 @@ export function findGameById(gameId: number): GameRow | undefined {
     .get(gameId) as GameRow | undefined;
 }
 
+export function findWaitingGameByInviteCode(inviteCode: string): GameRow | undefined {
+  return db
+    .prepare(
+      `
+    SELECT *
+    FROM games
+    WHERE invite_code = ?
+      AND status = 'waiting_for_black'
+    LIMIT 1
+  `,
+    )
+    .get(inviteCode) as GameRow | undefined;
+}
+
+export function findUnfinishedGameByPlayerPairKey(playerPairKey: string): GameRow | undefined {
+  return db
+    .prepare(
+      `
+    SELECT *
+    FROM games
+    WHERE player_pair_key = ?
+      AND finished_at IS NULL
+    LIMIT 1
+  `,
+    )
+    .get(playerPairKey) as GameRow | undefined;
+}
+
+export function activateGame(gameId: number, blackDeviceHash: string, playerPairKey: string, now: number): void {
+  db.prepare(
+    `
+    UPDATE games
+    SET status = 'active',
+        black_device_hash = ?,
+        player_pair_key = ?,
+        started_at = ?,
+        updated_at = ?
+    WHERE id = ?
+      AND status = 'waiting_for_black'
+  `,
+  ).run(blackDeviceHash, playerPairKey, now, now, gameId);
+}
+
 export function runGameTransaction<T>(callback: () => T): T {
   return db.transaction(callback)();
+}
+
+export function findGamesByDeviceHash(deviceHash: string): GameRow[] {
+  return db
+    .prepare(
+      `
+    SELECT *
+    FROM games
+    WHERE white_device_hash = ?
+       OR black_device_hash = ?
+    ORDER BY updated_at DESC
+  `,
+    )
+    .all(deviceHash, deviceHash) as GameRow[];
+}
+
+export function findGameByIdForDevice(gameId: number, deviceHash: string): GameRow | undefined {
+  return db
+    .prepare(
+      `
+    SELECT *
+    FROM games
+    WHERE id = ?
+      AND (
+        white_device_hash = ?
+        OR black_device_hash = ?
+      )
+    LIMIT 1
+  `,
+    )
+    .get(gameId, deviceHash, deviceHash) as GameRow | undefined;
 }

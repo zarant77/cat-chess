@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { createGame, createOrTouchDevice } from "./games/gameService.js";
+import { createGame, createOrTouchDevice, getGame, joinGame, listGames } from "./games/gameService.js";
 import { checkDatabaseHealth, listDebugInviteCodes } from "./db/repositories/debugRepository.js";
 
 const deviceBodySchema = z.object({
@@ -9,6 +9,19 @@ const deviceBodySchema = z.object({
 
 const authBodySchema = z.object({
   deviceSecret: z.string().min(16),
+});
+
+const authQuerySchema = z.object({
+  deviceSecret: z.string().min(16),
+});
+
+const joinGameBodySchema = z.object({
+  deviceSecret: z.string().min(16),
+  inviteCode: z.string().min(3).max(12),
+});
+
+const gameIdParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
 });
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
@@ -32,6 +45,27 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     const body = authBodySchema.parse(request.body);
 
     return createGame(body.deviceSecret);
+  });
+
+  app.get("/games", async (request) => {
+    const query = authQuerySchema.parse(request.query);
+
+    return {
+      games: listGames(query.deviceSecret),
+    };
+  });
+
+  app.get("/games/:id", async (request) => {
+    const params = gameIdParamsSchema.parse(request.params);
+    const query = authQuerySchema.parse(request.query);
+
+    return getGame(params.id, query.deviceSecret);
+  });
+
+  app.post("/games/join", async (request) => {
+    const body = joinGameBodySchema.parse(request.body);
+
+    return joinGame(body.inviteCode, body.deviceSecret);
   });
 
   app.get("/debug/invite-codes", async () => {

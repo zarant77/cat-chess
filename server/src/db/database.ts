@@ -9,7 +9,7 @@ const schemaPath = join(currentDir, "schema.sql");
 const dataDir = resolve(process.cwd(), "data");
 mkdirSync(dataDir, { recursive: true });
 
-const databasePath = resolve(dataDir, "cat-chess.sqlite");
+const databasePath = process.env.CAT_CHESS_DB_PATH ?? resolve(dataDir, "cat-chess.sqlite");
 
 export const db = new Database(databasePath);
 

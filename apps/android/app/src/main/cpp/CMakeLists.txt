@@ -46,6 +46,7 @@ add_custom_command(
 add_custom_target(pack_sprites DEPENDS ${CAT_CHESS_SPRITE_OUTPUTS})
 
 add_library(cat_chess SHARED
+    ../../../../src/app/app.c
     ../../../../src/audio/chess_sound.c
     ../../../../src/chess/chess_ai.c
     ../../../../src/chess/chess_board.c
@@ -54,17 +55,26 @@ add_library(cat_chess SHARED
     ../../../../src/chess/chess_rules.c
     ../../../../src/fonts/font_renderer.c
     ../../../../src/fonts/fonts_packed.c
-    ../../../../src/game/game.c
     ../../../../src/input/input.c
     ../../../../src/localization/localization.c
     ../../../../src/main.c
+    ../../../../src/online/cat_chess_api.c
+    ../../../../src/online/online_game.c
     ../../../../src/platform/platform_android.c
     ../../../../src/renderer/renderer.c
     ../../../../src/settings/game_settings.c
+    ../../../../src/storage/local_storage.c
     ../../../../src/sprites/definitions/sprites_packed.c
     ../../../../src/sprites/generated_sprite.c
     ../../../../src/ui/chess_board_view.c
     ../../../../src/ui/chess_piece_view.c
+    ../../../../src/ui/screens/screen_create_game.c
+    ../../../../src/ui/screens/screen_home.c
+    ../../../../src/ui/screens/screen_join_game.c
+    ../../../../src/ui/screens/screen_local_game.c
+    ../../../../src/ui/screens/screen_my_games.c
+    ../../../../src/ui/screens/screen_settings.c
+    ../../../../src/ui/ui_controls.c
 )
 
 add_dependencies(cat_chess pack_fonts pack_sprites)

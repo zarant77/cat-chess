@@ -55,7 +55,12 @@ static void chess_board_view_draw_border(Framebuffer* framebuffer, ChessBoardVie
     renderer_draw_color_rect(framebuffer, layout.x + layout.size, layout.y, 5, layout.size, 0x223127ffu);
 }
 
-void chess_board_view_render(Framebuffer* framebuffer, const GameState* game) {
+void chess_board_view_render(
+        Framebuffer* framebuffer,
+        const ChessGame* game,
+        int selected_square,
+        int last_tapped_square
+) {
     ChessBoardViewLayout layout;
 
     if (framebuffer == 0 || game == 0) {
@@ -74,12 +79,12 @@ void chess_board_view_render(Framebuffer* framebuffer, const GameState* game) {
 
             renderer_draw_color_rect(framebuffer, x, y, layout.squareSize, layout.squareSize, color);
 
-            if (game->hasSelection && square == game->selectedSquare) {
+            if (selected_square >= 0 && square == selected_square) {
                 renderer_draw_color_rect(framebuffer, x, y, layout.squareSize, 4, 0xf4c542ffu);
                 renderer_draw_color_rect(framebuffer, x, y + layout.squareSize - 4, layout.squareSize, 4, 0xf4c542ffu);
                 renderer_draw_color_rect(framebuffer, x, y, 4, layout.squareSize, 0xf4c542ffu);
                 renderer_draw_color_rect(framebuffer, x + layout.squareSize - 4, y, 4, layout.squareSize, 0xf4c542ffu);
-            } else if (square == game->tappedSquare) {
+            } else if (square == last_tapped_square) {
                 renderer_draw_color_rect(framebuffer, x + 4, y + 4, layout.squareSize - 8, layout.squareSize - 8, 0xffffff33u);
             }
 

@@ -3,7 +3,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "../ui/chess_board_view.h"
+#include "../ui/screens/screen_create_game.h"
+#include "../ui/screens/screen_home.h"
+#include "../ui/screens/screen_join_game.h"
+#include "../ui/screens/screen_local_game.h"
+#include "../ui/screens/screen_my_games.h"
+#include "../ui/screens/screen_settings.h"
 
 static uint8_t rgba_r(uint32_t color) {
     return (uint8_t)((color >> 24) & 0xff);
@@ -288,6 +293,48 @@ void renderer_draw_generated_sprite_palette(
     }
 }
 
+void renderer_draw_generated_sprite_region_scaled(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int src_x,
+        int src_y,
+        int src_width,
+        int src_height,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height
+) {
+    if (framebuffer == 0
+            || sprite == 0
+            || sprite->pixels == 0
+            || src_width <= 0
+            || src_height <= 0
+            || dst_width <= 0
+            || dst_height <= 0) {
+        return;
+    }
+
+    for (int y = 0; y < dst_height; ++y) {
+        int sample_y = src_y + (y * src_height) / dst_height;
+        if (sample_y < 0 || sample_y >= sprite->height) {
+            continue;
+        }
+
+        for (int x = 0; x < dst_width; ++x) {
+            int sample_x = src_x + (x * src_width) / dst_width;
+            uint32_t src;
+
+            if (sample_x < 0 || sample_x >= sprite->width) {
+                continue;
+            }
+
+            src = sprite->pixels[sample_y * (int)sprite->width + sample_x];
+            renderer_write_pixel(framebuffer, dst_x + x, dst_y + y, src);
+        }
+    }
+}
+
 void renderer_draw_generated_sprite_fit(
         Framebuffer* framebuffer,
         const GeneratedSprite* sprite,
@@ -309,11 +356,23 @@ void renderer_draw_generated_sprite_fit(
     );
 }
 
-void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game) {
-    if (buffer == 0 || buffer->bits == 0 || game == 0) {
+void renderer_draw_frame(ANativeWindow_Buffer* buffer, const AppState* app) {
+    if (buffer == 0 || buffer->bits == 0 || app == 0) {
         return;
     }
 
     renderer_fill_vertical_gradient(buffer, 0xf5f0e7ffu, 0xb8d2c7ffu);
-    chess_board_view_render(buffer, game);
+    if (app->currentScreen == APP_SCREEN_HOME) {
+        screen_home_render(buffer, app);
+    } else if (app->currentScreen == APP_SCREEN_LOCAL_GAME) {
+        screen_local_game_render(buffer, app);
+    } else if (app->currentScreen == APP_SCREEN_CREATE_GAME) {
+        screen_create_game_render(buffer, app);
+    } else if (app->currentScreen == APP_SCREEN_JOIN_GAME) {
+        screen_join_game_render(buffer, app);
+    } else if (app->currentScreen == APP_SCREEN_MY_GAMES) {
+        screen_my_games_render(buffer, app);
+    } else if (app->currentScreen == APP_SCREEN_SETTINGS) {
+        screen_settings_render(buffer, app);
+    }
 }

@@ -7,7 +7,9 @@
     "dev": "tsx watch src/main.ts",
     "build": "tsc",
     "start": "node dist/main.js",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test": "CAT_CHESS_DB_PATH=':memory:' vitest run",
+    "test:watch": "CAT_CHESS_DB_PATH=':memory:' vitest"
   },
   "dependencies": {
     "@fastify/websocket": "^11.0.1",
@@ -19,6 +21,7 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.13.10",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^4.1.8"
   }
 }

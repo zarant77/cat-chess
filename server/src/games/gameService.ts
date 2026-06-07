@@ -1,8 +1,13 @@
-import { createDeviceSecret, hashDeviceSecret, isValidDeviceSecret } from "../security/device.js";
+import { createDeviceSecret, createPlayerPairKey, hashDeviceSecret, isValidDeviceSecret } from "../security/device.js";
 import { upsertDevice } from "../db/repositories/deviceRepository.js";
-import { reserveInviteCode } from "./inviteCodes.js";
+import { releaseInviteCodeForGame, reserveInviteCode } from "./inviteCodes.js";
 import {
+  activateGame,
   findGameById,
+  findGameByIdForDevice,
+  findGamesByDeviceHash,
+  findUnfinishedGameByPlayerPairKey,
+  findWaitingGameByInviteCode,
   insertWaitingGame,
   runGameTransaction,
   setGameInviteCode,
@@ -72,6 +77,55 @@ export function createGame(deviceSecret: string): GameDto {
   });
 }
 
+export function joinGame(inviteCode: string, deviceSecret: string): GameDto {
+  const device = createOrTouchDevice(deviceSecret);
+  const now = nowSec();
+  const normalizedInviteCode = inviteCode.trim().toUpperCase();
+
+  return runGameTransaction(() => {
+    const waitingGame = findWaitingGameByInviteCode(normalizedInviteCode);
+
+    if (!waitingGame) {
+      throw new Error("invite_code_not_found");
+    }
+
+    if (waitingGame.white_device_hash === device.deviceHash) {
+      throw new Error("cannot_join_own_game");
+    }
+
+    const playerPairKey = createPlayerPairKey(waitingGame.white_device_hash, device.deviceHash);
+
+    const existingGame = findUnfinishedGameByPlayerPairKey(playerPairKey);
+
+    if (existingGame) {
+      throw new Error("game_between_players_already_exists");
+    }
+
+    activateGame(waitingGame.id, device.deviceHash, playerPairKey, now);
+    releaseInviteCodeForGame(waitingGame.id);
+
+    const game = findGameById(waitingGame.id);
+
+    if (!game) {
+      throw new Error("game_not_found_after_join");
+    }
+
+    return toGameDto(game, "black");
+  });
+}
+
+function getColorForDevice(row: GameRow, deviceHash: string): PlayerColor | null {
+  if (row.white_device_hash === deviceHash) {
+    return "white";
+  }
+
+  if (row.black_device_hash === deviceHash) {
+    return "black";
+  }
+
+  return null;
+}
+
 function toGameDto(row: GameRow, yourColor: PlayerColor | null): GameDto {
   return {
     id: row.id,
@@ -85,4 +139,24 @@ function toGameDto(row: GameRow, yourColor: PlayerColor | null): GameDto {
     startedAt: row.started_at,
     finishedAt: row.finished_at,
   };
+}
+
+export function listGames(deviceSecret: string): GameDto[] {
+  const device = createOrTouchDevice(deviceSecret);
+  const games = findGamesByDeviceHash(device.deviceHash);
+
+  return games.map((game) => {
+    return toGameDto(game, getColorForDevice(game, device.deviceHash));
+  });
+}
+
+export function getGame(gameId: number, deviceSecret: string): GameDto {
+  const device = createOrTouchDevice(deviceSecret);
+  const game = findGameByIdForDevice(gameId, device.deviceHash);
+
+  if (!game) {
+    throw new Error("game_not_found");
+  }
+
+  return toGameDto(game, getColorForDevice(game, device.deviceHash));
 }

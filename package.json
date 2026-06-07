@@ -13,7 +13,10 @@
     "start:server": "pnpm --dir server start",
     "start:web": "pnpm --dir apps/web preview",
     "check": "pnpm --dir server check && pnpm --dir apps/web check",
-    "android": "./build-android.sh"
+    "android": "./build-android.sh",
+    "test": "pnpm --dir server test",
+    "test:server": "pnpm --dir server test",
+    "test:server:watch": "pnpm --dir server test:watch"
   },
   "devDependencies": {}
 }

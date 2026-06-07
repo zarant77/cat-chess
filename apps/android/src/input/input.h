@@ -5,9 +5,11 @@ typedef struct {
     int activePointerId;
     int touchActive;
     int tapReleased;
-    int tapSquare;
+    int backPressed;
     float touchX;
     float touchY;
+    float tapX;
+    float tapY;
 } InputState;
 
 #define INPUT_TOUCH_DOWN 1
@@ -25,5 +27,6 @@ void input_handle_touch(
         float screen_width
 );
 void input_end_frame(InputState* input);
+void input_handle_back(InputState* input);
 
 #endif

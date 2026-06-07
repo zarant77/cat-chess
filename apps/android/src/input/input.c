@@ -10,9 +10,11 @@ void input_init(InputState* input) {
     input->activePointerId = INPUT_NO_POINTER;
     input->touchActive = 0;
     input->tapReleased = 0;
-    input->tapSquare = -1;
+    input->backPressed = 0;
     input->touchX = 0.0f;
     input->touchY = 0.0f;
+    input->tapX = 0.0f;
+    input->tapY = 0.0f;
 }
 
 void input_handle_touch(
@@ -52,6 +54,8 @@ void input_handle_touch(
             input->touchActive = 0;
             input->activePointerId = INPUT_NO_POINTER;
             input->tapReleased = 1;
+            input->tapX = x;
+            input->tapY = y;
         }
         return;
     }
@@ -60,7 +64,7 @@ void input_handle_touch(
         input->activePointerId = INPUT_NO_POINTER;
         input->touchActive = 0;
         input->tapReleased = 0;
-        input->tapSquare = -1;
+        input->backPressed = 0;
     }
 }
 
@@ -70,5 +74,13 @@ void input_end_frame(InputState* input) {
     }
 
     input->tapReleased = 0;
-    input->tapSquare = -1;
+    input->backPressed = 0;
+}
+
+void input_handle_back(InputState* input) {
+    if (input == 0) {
+        return;
+    }
+
+    input->backPressed = 1;
 }

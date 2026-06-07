@@ -4,7 +4,7 @@
 #include <android/native_window.h>
 #include <stdint.h>
 
-#include "../game/game.h"
+#include "../app/app_state.h"
 #include "../sprites/generated_sprite.h"
 
 typedef ANativeWindow_Buffer Framebuffer;
@@ -60,7 +60,19 @@ void renderer_draw_generated_sprite_palette(
         uint32_t backing_color,
         uint32_t base_color
 );
+void renderer_draw_generated_sprite_region_scaled(
+        Framebuffer* framebuffer,
+        const GeneratedSprite* sprite,
+        int src_x,
+        int src_y,
+        int src_width,
+        int src_height,
+        int dst_x,
+        int dst_y,
+        int dst_width,
+        int dst_height
+);
 
-void renderer_draw_frame(ANativeWindow_Buffer* buffer, const GameState* game);
+void renderer_draw_frame(ANativeWindow_Buffer* buffer, const AppState* app);
 
 #endif

@@ -9,11 +9,10 @@
 #include <time.h>
 
 #include "../config.h"
-#include "../game/game.h"
+#include "../app/app.h"
 #include "../input/input.h"
 #include "../renderer/renderer.h"
 #include "../sprites/generated_sprite.h"
-#include "../ui/chess_board_view.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, CAT_CHESS_LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, CAT_CHESS_LOG_TAG, __VA_ARGS__)
@@ -28,7 +27,7 @@ typedef struct AndroidPlatform {
     int input_cancel_requested;
     pthread_t thread;
     volatile int loop_running;
-    GameState game;
+    AppState app;
     InputState input;
     double fps_elapsed;
     double fps_frame_time_total;
@@ -103,15 +102,6 @@ static void platform_handle_motion_event(
                 y,
                 screen_width);
 
-        if (action_type == AMOTION_EVENT_ACTION_UP
-                || action_type == AMOTION_EVENT_ACTION_POINTER_UP) {
-            platform->input.tapSquare = chess_board_view_square_at(
-                    platform->game.screenWidth,
-                    platform->game.screenHeight,
-                    x,
-                    y
-            );
-        }
         return;
     }
 
@@ -137,7 +127,7 @@ static int platform_handle_key_event(AndroidPlatform* platform, AInputEvent* eve
     }
 
     if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
-        platform->game.exitRequested = 1;
+        input_handle_back(&platform->input);
     }
 
     return 1;
@@ -250,10 +240,10 @@ static int platform_draw(AndroidPlatform* platform, float dt) {
         platform->buffer_format_logged = 1;
     }
 
-    game_set_screen_size(&platform->game, (float)buffer.width, (float)buffer.height);
-    game_update(&platform->game, &platform->input, dt);
+    app_set_screen_size(&platform->app, (float)buffer.width, (float)buffer.height);
+    app_update(&platform->app, &platform->input, dt);
     input_end_frame(&platform->input);
-    renderer_draw_frame(&buffer, &platform->game);
+    renderer_draw_frame(&buffer, &platform->app);
     ANativeWindow_unlockAndPost(window);
     ANativeWindow_release(window);
 
@@ -284,8 +274,8 @@ static void platform_update_fps(AndroidPlatform* platform, float frame_time) {
         return;
     }
 
-    platform->game.fps = (int)((double)platform->fps_frame_count / platform->fps_elapsed + 0.5);
-    platform->game.averageFrameMs = (int)((platform->fps_frame_time_total * 1000.0)
+    platform->app.fps = (int)((double)platform->fps_frame_count / platform->fps_elapsed + 0.5);
+    platform->app.averageFrameMs = (int)((platform->fps_frame_time_total * 1000.0)
             / (double)platform->fps_frame_count);
 
     platform->fps_elapsed = 0.0;
@@ -295,7 +285,7 @@ static void platform_update_fps(AndroidPlatform* platform, float frame_time) {
 
 static void platform_handle_exit_requested(AndroidPlatform* platform) {
     if (platform == NULL
-            || !platform->game.exitRequested
+            || !platform->app.exitRequested
             || platform->finish_requested) {
         return;
     }
@@ -318,7 +308,7 @@ static void* platform_game_loop(void* data) {
     while (platform->loop_running) {
         double frame_start = platform_now_seconds();
         float dt = (float)(frame_start - last_time);
-        float input_screen_width = (float)platform->game.screenWidth;
+        float input_screen_width = (float)platform->app.screenWidth;
         double frame_elapsed;
 
         last_time = frame_start;
@@ -500,7 +490,7 @@ void platform_android_on_create(
     platform->reset_frame_time = 1;
 
     generated_sprite_initialize_all();
-    game_init(&platform->game);
+    app_init(&platform->app);
     input_init(&platform->input);
 
     activity->callbacks->onInputQueueCreated = platform_on_input_queue_created;

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CatChessGameState",
+  "type": "object",
+  "required": ["code", "status", "sideToMove", "board", "moveNumber"],
+  "properties": {
+    "code": { "type": "string", "pattern": "^[A-Z0-9]{6}$" },
+    "status": {
+      "type": "string",
+      "enum": ["waiting_for_black", "active", "white_won", "black_won", "draw", "abandoned"]
+    },
+    "sideToMove": { "type": "string", "enum": ["white", "black"] },
+    "board": { "type": "string" },
+    "lastMove": { "type": ["string", "null"] },
+    "moveNumber": { "type": "integer", "minimum": 1 }
+  },
+  "additionalProperties": false
+}

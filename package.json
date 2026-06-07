@@ -1,0 +1,19 @@
+{
+  "name": "cat-chess",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "pnpm dev:server",
+    "dev:server": "pnpm --dir server dev",
+    "dev:web": "pnpm --dir apps/web dev",
+    "build": "pnpm build:server && pnpm build:web",
+    "build:server": "pnpm --dir server build",
+    "build:web": "pnpm --dir apps/web build",
+    "start": "pnpm start:server",
+    "start:server": "pnpm --dir server start",
+    "start:web": "pnpm --dir apps/web preview",
+    "check": "pnpm --dir server check && pnpm --dir apps/web check",
+    "android": "./build-android.sh"
+  },
+  "devDependencies": {}
+}

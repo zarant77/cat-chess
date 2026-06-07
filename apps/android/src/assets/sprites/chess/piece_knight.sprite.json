@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "id": "piece_knight",
+  "width": 256,
+  "height": 256,
+  "pivotX": 128,
+  "pivotY": 128,
+  "primitives": [
+    { "kind": "rect", "x": 132, "y": 210, "w": 164, "h": 40, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 136, "y": 160, "w": 112, "h": 108, "rotation": -10, "color": "ffffffff" },
+    { "kind": "circle", "x": 110, "y": 104, "w": 104, "h": 116, "rotation": 0, "color": "ffffffff" },
+    { "kind": "triangle", "x": 164, "y": 80, "w": 124, "h": 96, "rotation": 17, "color": "ffffffff" },
+    { "kind": "triangle", "x": 80, "y": 56, "w": 56, "h": 68, "rotation": -28, "color": "ffffffff" },
+    { "kind": "rect", "x": 132, "y": 210, "w": 136, "h": 24, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 136, "y": 160, "w": 84, "h": 88, "rotation": -10, "color": "000000ff" },
+    { "kind": "circle", "x": 110, "y": 104, "w": 80, "h": 92, "rotation": 0, "color": "000000ff" },
+    { "kind": "triangle", "x": 160, "y": 84, "w": 96, "h": 72, "rotation": 17, "color": "000000ff" },
+    { "kind": "triangle", "x": 84, "y": 60, "w": 36, "h": 48, "rotation": -28, "color": "000000ff" },
+    { "kind": "circle", "x": 140, "y": 88, "w": 16, "h": 16, "rotation": 0, "color": "ffffffff" }
+  ]
+}

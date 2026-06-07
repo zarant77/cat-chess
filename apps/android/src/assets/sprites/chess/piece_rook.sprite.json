@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "id": "piece_rook",
+  "width": 256,
+  "height": 256,
+  "pivotX": 128,
+  "pivotY": 128,
+  "primitives": [
+    { "kind": "rect", "x": 128, "y": 210, "w": 168, "h": 40, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 160, "w": 120, "h": 108, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 100, "w": 144, "h": 60, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 84, "y": 62, "w": 36, "h": 56, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 62, "w": 36, "h": 56, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 172, "y": 62, "w": 36, "h": 56, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 210, "w": 140, "h": 24, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 160, "w": 96, "h": 88, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 100, "w": 120, "h": 40, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 84, "y": 64, "w": 20, "h": 40, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 64, "w": 20, "h": 40, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 172, "y": 64, "w": 20, "h": 40, "rotation": 0, "color": "000000ff" }
+  ]
+}

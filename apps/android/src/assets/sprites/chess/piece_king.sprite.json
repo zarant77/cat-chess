@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "piece_king",
+  "width": 256,
+  "height": 256,
+  "pivotX": 128,
+  "pivotY": 128,
+  "primitives": [
+    { "kind": "rect", "x": 128, "y": 210, "w": 172, "h": 40, "rotation": 0, "color": "ffffffff" },
+    { "kind": "circle", "x": 128, "y": 156, "w": 128, "h": 104, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 104, "w": 84, "h": 116, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 40, "w": 28, "h": 64, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 36, "w": 76, "h": 24, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 210, "w": 140, "h": 24, "rotation": 0, "color": "000000ff" },
+    { "kind": "circle", "x": 128, "y": 156, "w": 104, "h": 84, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 104, "w": 60, "h": 92, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 42, "w": 16, "h": 48, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 38, "w": 56, "h": 12, "rotation": 0, "color": "000000ff" }
+  ]
+}

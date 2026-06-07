@@ -1,0 +1,18 @@
+#ifndef CAT_CHESS_SOUND_H
+#define CAT_CHESS_SOUND_H
+
+typedef enum {
+    CHESS_SOUND_MOVE,
+    CHESS_SOUND_CAPTURE,
+    CHESS_SOUND_CHECK,
+    CHESS_SOUND_CHECKMATE,
+    CHESS_SOUND_ILLEGAL_MOVE,
+    CHESS_SOUND_CASTLE,
+    CHESS_SOUND_PROMOTION,
+    CHESS_SOUND_GAME_START,
+    CHESS_SOUND_GAME_END
+} ChessSoundEvent;
+
+void chess_sound_play(ChessSoundEvent event);
+
+#endif

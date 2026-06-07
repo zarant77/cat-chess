@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CatChessMoveRequest",
+  "type": "object",
+  "required": ["secret", "move"],
+  "properties": {
+    "secret": { "type": "string", "minLength": 32 },
+    "move": { "type": "string", "pattern": "^[a-h][1-8][a-h][1-8][qrbn]?$" }
+  },
+  "additionalProperties": false
+}

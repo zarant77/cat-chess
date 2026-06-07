@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "id": "piece_bishop",
+  "width": 256,
+  "height": 256,
+  "pivotX": 128,
+  "pivotY": 128,
+  "primitives": [
+    { "kind": "circle", "x": 128, "y": 48, "w": 52, "h": 52, "rotation": 0, "color": "ffffffff" },
+    { "kind": "circle", "x": 128, "y": 112, "w": 112, "h": 144, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 188, "w": 120, "h": 48, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 216, "w": 164, "h": 36, "rotation": 0, "color": "ffffffff" },
+    { "kind": "circle", "x": 128, "y": 50, "w": 32, "h": 32, "rotation": 0, "color": "000000ff" },
+    { "kind": "circle", "x": 128, "y": 114, "w": 88, "h": 120, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 188, "w": 96, "h": 32, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 128, "y": 216, "w": 136, "h": 20, "rotation": 0, "color": "000000ff" },
+    { "kind": "rect", "x": 140, "y": 108, "w": 16, "h": 84, "rotation": 32, "color": "ffffffff" }
+  ]
+}

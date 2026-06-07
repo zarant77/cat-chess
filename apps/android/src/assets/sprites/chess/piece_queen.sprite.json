@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "id": "piece_queen",
+  "width": 256,
+  "height": 256,
+  "pivotX": 128,
+  "pivotY": 128,
+  "primitives": [
+    { "kind": "rect", "x": 128, "y": 210, "w": 172, "h": 40, "rotation": 0, "color": "ffffffff" },
+    { "kind": "circle", "x": 128, "y": 156, "w": 128, "h": 100, "rotation": 0, "color": "ffffffff" },
+    { "kind": "triangle", "x": 80, "y": 100, "w": 72, "h": 124, "rotation": -10, "color": "ffffffff" },
+    { "kind": "triangle", "x": 128, "y": 88, "w": 80, "h": 144, "rotation": 0, "color": "ffffffff" },
+    { "kind": "triangle", "x": 176, "y": 100, "w": 72, "h": 124, "rotation": 10, "color": "ffffffff" },
+    { "kind": "circle", "x": 76, "y": 52, "w": 36, "h": 36, "rotation": 0, "color": "ffffffff" },
+    { "kind": "circle", "x": 128, "y": 40, "w": 40, "h": 40, "rotation": 0, "color": "ffffffff" },
+    { "kind": "circle", "x": 180, "y": 52, "w": 36, "h": 36, "rotation": 0, "color": "ffffffff" },
+    { "kind": "rect", "x": 128, "y": 210, "w": 140, "h": 24, "rotation": 0, "color": "000000ff" },
+    { "kind": "circle", "x": 128, "y": 156, "w": 104, "h": 80, "rotation": 0, "color": "000000ff" },
+    { "kind": "triangle", "x": 84, "y": 104, "w": 48, "h": 100, "rotation": -10, "color": "000000ff" },
+    { "kind": "triangle", "x": 128, "y": 92, "w": 56, "h": 116, "rotation": 0, "color": "000000ff" },
+    { "kind": "triangle", "x": 172, "y": 104, "w": 48, "h": 100, "rotation": 10, "color": "000000ff" },
+    { "kind": "circle", "x": 76, "y": 54, "w": 20, "h": 20, "rotation": 0, "color": "000000ff" },
+    { "kind": "circle", "x": 128, "y": 42, "w": 24, "h": 24, "rotation": 0, "color": "000000ff" },
+    { "kind": "circle", "x": 180, "y": 54, "w": 20, "h": 20, "rotation": 0, "color": "000000ff" }
+  ]
+}

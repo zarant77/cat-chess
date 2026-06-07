@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { db } from "../db/database.js";
-import { createGame, createOrTouchDevice, getGame, joinGame, listGames } from "./gameService.js";
+import { createGame, createOrTouchDevice, getGame, joinGame, listGameMoves, listGames, makeMove, resignGame } from "./gameService.js";
 import { resetTestDatabase } from "../test/testDatabase.js";
 
 describe("gameService", () => {
@@ -237,5 +237,259 @@ describe("gameService", () => {
     const games = listGames(stranger.deviceSecret);
 
     expect(games).toHaveLength(0);
+  });
+
+  it("allows white to make first move", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    const movedGame = makeMove(createdGame.id, white.deviceSecret, "e2e4");
+
+    expect(movedGame.id).toBe(createdGame.id);
+    expect(movedGame.sideToMove).toBe("black");
+    expect(movedGame.yourColor).toBe("white");
+
+    const moves = db
+      .prepare(
+        `
+    SELECT move_index, color, uci
+    FROM moves
+    WHERE game_id = ?
+    ORDER BY move_index ASC
+  `,
+      )
+      .all(createdGame.id) as Array<{
+      move_index: number;
+      color: string;
+      uci: string;
+    }>;
+
+    expect(moves).toHaveLength(1);
+    expect(moves[0]).toEqual({
+      move_index: 0,
+      color: "white",
+      uci: "e2e4",
+    });
+  });
+
+  it("allows black to move after white", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    makeMove(createdGame.id, white.deviceSecret, "e2e4");
+    const movedGame = makeMove(createdGame.id, black.deviceSecret, "e7e5");
+
+    expect(movedGame.sideToMove).toBe("white");
+
+    const moves = db
+      .prepare(
+        `
+    SELECT move_index, color, uci
+    FROM moves
+    WHERE game_id = ?
+    ORDER BY move_index ASC
+  `,
+      )
+      .all(createdGame.id) as Array<{
+      move_index: number;
+      color: string;
+      uci: string;
+    }>;
+
+    expect(moves).toHaveLength(2);
+    expect(moves[1]).toEqual({
+      move_index: 1,
+      color: "black",
+      uci: "e7e5",
+    });
+  });
+
+  it("normalizes move format", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    makeMove(createdGame.id, white.deviceSecret, "  E2E4  ");
+
+    const move = db
+      .prepare(
+        `
+    SELECT uci
+    FROM moves
+    WHERE game_id = ?
+    LIMIT 1
+  `,
+      )
+      .get(createdGame.id) as { uci: string };
+
+    expect(move.uci).toBe("e2e4");
+  });
+
+  it("rejects invalid move format", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    expect(() => {
+      makeMove(createdGame.id, white.deviceSecret, "cat");
+    }).toThrow("invalid_move_format");
+  });
+
+  it("does not allow move before game is active", () => {
+    const white = createOrTouchDevice();
+    const createdGame = createGame(white.deviceSecret);
+
+    expect(() => {
+      makeMove(createdGame.id, white.deviceSecret, "e2e4");
+    }).toThrow("game_not_active");
+  });
+
+  it("does not allow black to move first", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    expect(() => {
+      makeMove(createdGame.id, black.deviceSecret, "e7e5");
+    }).toThrow("not_your_turn");
+  });
+
+  it("does not allow stranger to move", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+    const stranger = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    expect(() => {
+      makeMove(createdGame.id, stranger.deviceSecret, "e2e4");
+    }).toThrow("not_your_game");
+  });
+
+  it("lists moves for participant", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    makeMove(createdGame.id, white.deviceSecret, "e2e4");
+    makeMove(createdGame.id, black.deviceSecret, "e7e5");
+
+    const moves = listGameMoves(createdGame.id, white.deviceSecret);
+
+    expect(moves).toHaveLength(2);
+    expect(moves[0]?.moveIndex).toBe(0);
+    expect(moves[0]?.color).toBe("white");
+    expect(moves[0]?.uci).toBe("e2e4");
+
+    expect(moves[1]?.moveIndex).toBe(1);
+    expect(moves[1]?.color).toBe("black");
+    expect(moves[1]?.uci).toBe("e7e5");
+  });
+
+  it("does not list moves for non-participant", () => {
+    const white = createOrTouchDevice();
+    const stranger = createOrTouchDevice();
+
+    const game = createGame(white.deviceSecret);
+
+    expect(() => {
+      listGameMoves(game.id, stranger.deviceSecret);
+    }).toThrow("game_not_found");
+  });
+
+  it("allows white to resign and black wins", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    const resignedGame = resignGame(createdGame.id, white.deviceSecret);
+
+    expect(resignedGame.status).toBe("finished");
+    expect(resignedGame.result).toBe("black_won");
+    expect(resignedGame.finishedAt).not.toBeNull();
+    expect(resignedGame.yourColor).toBe("white");
+  });
+
+  it("allows black to resign and white wins", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    const resignedGame = resignGame(createdGame.id, black.deviceSecret);
+
+    expect(resignedGame.status).toBe("finished");
+    expect(resignedGame.result).toBe("white_won");
+    expect(resignedGame.finishedAt).not.toBeNull();
+    expect(resignedGame.yourColor).toBe("black");
+  });
+
+  it("does not allow resign before game is active", () => {
+    const white = createOrTouchDevice();
+    const createdGame = createGame(white.deviceSecret);
+
+    expect(() => {
+      resignGame(createdGame.id, white.deviceSecret);
+    }).toThrow("game_not_active");
+  });
+
+  it("does not allow stranger to resign", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+    const stranger = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    expect(() => {
+      resignGame(createdGame.id, stranger.deviceSecret);
+    }).toThrow("not_your_game");
+  });
+
+  it("does not allow move after resign", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+    resignGame(createdGame.id, white.deviceSecret);
+
+    expect(() => {
+      makeMove(createdGame.id, black.deviceSecret, "e7e5");
+    }).toThrow("game_not_active");
+  });
+
+  it("allows same pair to create a new game after previous game is finished", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const firstGame = createGame(white.deviceSecret);
+    joinGame(firstGame.inviteCode!, black.deviceSecret);
+    resignGame(firstGame.id, white.deviceSecret);
+
+    const secondGame = createGame(white.deviceSecret);
+    const joinedSecondGame = joinGame(secondGame.inviteCode!, black.deviceSecret);
+
+    expect(joinedSecondGame.id).toBe(secondGame.id);
+    expect(joinedSecondGame.status).toBe("active");
+    expect(joinedSecondGame.result).toBeNull();
   });
 });

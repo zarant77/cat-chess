@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
         android:hasCode="false"
-        android:label="Cat Chess"
+        android:label="CAT CHESS"
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
         android:allowBackup="false"
@@ -12,7 +12,7 @@
         <activity
             android:name="android.app.NativeActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:screenOrientation="landscape"
+            android:screenOrientation="portrait"
             android:exported="true">
 
             <meta-data

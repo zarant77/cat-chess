@@ -1,12 +1,14 @@
 import { db } from "../database.js";
 
 export type GameStatus = "waiting_for_black" | "active" | "finished";
+export type GameResult = "white_won" | "black_won" | "draw";
 export type PlayerColor = "white" | "black";
 
 export interface GameRow {
   id: number;
   invite_code: string | null;
   status: GameStatus;
+  result: GameResult | null;
   board_fen: string;
   side_to_move: PlayerColor;
   white_device_hash: string;
@@ -25,6 +27,7 @@ export function insertWaitingGame(boardFen: string, whiteDeviceHash: string, now
     INSERT INTO games (
       invite_code,
       status,
+      result,
       board_fen,
       side_to_move,
       white_device_hash,
@@ -38,6 +41,7 @@ export function insertWaitingGame(boardFen: string, whiteDeviceHash: string, now
     VALUES (
       NULL,
       'waiting_for_black',
+      NULL,
       ?,
       'white',
       ?,
@@ -121,10 +125,6 @@ export function activateGame(gameId: number, blackDeviceHash: string, playerPair
   ).run(blackDeviceHash, playerPairKey, now, now, gameId);
 }
 
-export function runGameTransaction<T>(callback: () => T): T {
-  return db.transaction(callback)();
-}
-
 export function findGamesByDeviceHash(deviceHash: string): GameRow[] {
   return db
     .prepare(
@@ -154,4 +154,33 @@ export function findGameByIdForDevice(gameId: number, deviceHash: string): GameR
   `,
     )
     .get(gameId, deviceHash, deviceHash) as GameRow | undefined;
+}
+
+export function updateGameAfterMove(gameId: number, nextSideToMove: PlayerColor, now: number): void {
+  db.prepare(
+    `
+    UPDATE games
+    SET side_to_move = ?,
+        updated_at = ?
+    WHERE id = ?
+  `,
+  ).run(nextSideToMove, now, gameId);
+}
+
+export function finishGame(gameId: number, result: GameResult, now: number): void {
+  db.prepare(
+    `
+    UPDATE games
+    SET status = 'finished',
+        result = ?,
+        updated_at = ?,
+        finished_at = ?
+    WHERE id = ?
+      AND status = 'active'
+  `,
+  ).run(result, now, now, gameId);
+}
+
+export function runGameTransaction<T>(callback: () => T): T {
+  return db.transaction(callback)();
 }

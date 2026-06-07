@@ -59,6 +59,7 @@ add_library(cat_chess SHARED
     ../../../../src/localization/localization.c
     ../../../../src/main.c
     ../../../../src/online/cat_chess_api.c
+    ../../../../src/online/cat_chess_models.c
     ../../../../src/online/online_game.c
     ../../../../src/platform/platform_android.c
     ../../../../src/renderer/renderer.c
@@ -69,6 +70,7 @@ add_library(cat_chess SHARED
     ../../../../src/ui/chess_board_view.c
     ../../../../src/ui/chess_piece_view.c
     ../../../../src/ui/screens/screen_create_game.c
+    ../../../../src/ui/screens/screen_game.c
     ../../../../src/ui/screens/screen_home.c
     ../../../../src/ui/screens/screen_join_game.c
     ../../../../src/ui/screens/screen_local_game.c

@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "../ui/screens/screen_create_game.h"
+#include "../ui/screens/screen_game.h"
 #include "../ui/screens/screen_home.h"
 #include "../ui/screens/screen_join_game.h"
 #include "../ui/screens/screen_local_game.h"
@@ -372,6 +373,8 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const AppState* app) {
         screen_join_game_render(buffer, app);
     } else if (app->currentScreen == APP_SCREEN_MY_GAMES) {
         screen_my_games_render(buffer, app);
+    } else if (app->currentScreen == APP_SCREEN_GAME) {
+        screen_game_render(buffer, app);
     } else if (app->currentScreen == APP_SCREEN_SETTINGS) {
         screen_settings_render(buffer, app);
     }

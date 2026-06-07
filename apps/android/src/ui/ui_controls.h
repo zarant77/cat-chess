@@ -42,6 +42,13 @@ void ui_draw_button_colored(
         uint32_t fill_color,
         uint32_t border_color
 );
+void ui_draw_button_scaled(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect rect,
+        const char* label,
+        int scale
+);
 void ui_draw_label(
         Framebuffer* framebuffer,
         const PackedFont* font,

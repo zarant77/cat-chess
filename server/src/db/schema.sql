@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS games (
 
     invite_code TEXT,
     status TEXT NOT NULL,
+    result TEXT,
 
     board_fen TEXT NOT NULL,
     side_to_move TEXT NOT NULL,

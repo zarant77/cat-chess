@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "flag_uk",
+  "width": 96,
+  "height": 64,
+  "pivotX": 48,
+  "pivotY": 32,
+  "primitives": [
+    {
+      "kind": "rect",
+      "x": 48,
+      "y": 32,
+      "w": 96,
+      "h": 64,
+      "rotation": 0,
+      "color": "f4f1deff"
+    },
+    {
+      "kind": "rect",
+      "x": 48,
+      "y": 17,
+      "w": 88,
+      "h": 28,
+      "rotation": 0,
+      "color": "0057b7ff"
+    },
+    {
+      "kind": "rect",
+      "x": 48,
+      "y": 45,
+      "w": 88,
+      "h": 28,
+      "rotation": 0,
+      "color": "ffd700ff"
+    },
+    {
+      "kind": "rect",
+      "x": 48,
+      "y": 4,
+      "w": 96,
+      "h": 4,
+      "rotation": 0,
+      "color": "101722ff"
+    },
+    {
+      "kind": "rect",
+      "x": 48,
+      "y": 62,
+      "w": 96,
+      "h": 4,
+      "rotation": 0,
+      "color": "101722ff"
+    },
+    {
+      "kind": "rect",
+      "x": 2,
+      "y": 32,
+      "w": 4,
+      "h": 64,
+      "rotation": 0,
+      "color": "101722ff"
+    },
+    {
+      "kind": "rect",
+      "x": 94,
+      "y": 32,
+      "w": 4,
+      "h": 64,
+      "rotation": 0,
+      "color": "101722ff"
+    }
+  ]
+}

@@ -17,6 +17,10 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, CAT_CHESS_LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, CAT_CHESS_LOG_TAG, __VA_ARGS__)
 
+#ifndef ANATIVEACTIVITY_SHOW_SOFT_INPUT_IMPLICIT
+#define ANATIVEACTIVITY_SHOW_SOFT_INPUT_IMPLICIT 0
+#endif
+
 typedef struct AndroidPlatform {
     ANativeActivity* activity;
     ANativeWindow* window;
@@ -213,6 +217,7 @@ static ANativeWindow* platform_acquire_window(AndroidPlatform* platform) {
 static int platform_draw(AndroidPlatform* platform, float dt) {
     ANativeWindow* window;
     ANativeWindow_Buffer buffer;
+    int should_show_keyboard;
 
     if (platform == NULL) {
         return 0;
@@ -242,10 +247,15 @@ static int platform_draw(AndroidPlatform* platform, float dt) {
 
     app_set_screen_size(&platform->app, (float)buffer.width, (float)buffer.height);
     app_update(&platform->app, &platform->input, dt);
+    should_show_keyboard = app_take_soft_keyboard_request(&platform->app);
     input_end_frame(&platform->input);
     renderer_draw_frame(&buffer, &platform->app);
     ANativeWindow_unlockAndPost(window);
     ANativeWindow_release(window);
+
+    if (should_show_keyboard && platform->activity != NULL) {
+        ANativeActivity_showSoftInput(platform->activity, ANATIVEACTIVITY_SHOW_SOFT_INPUT_IMPLICIT);
+    }
 
     return 1;
 }

@@ -1,45 +1,84 @@
 #include "screen_home.h"
 
 #include "../../fonts/font_renderer.h"
+#include "../../localization/localization.h"
 #include "../ui_controls.h"
 
 #define HOME_BUTTON_COUNT 5
+#define HOME_BUTTON_FONT_SCALE 3
+#define HOME_BUTTON_HEIGHT 112
+#define HOME_BUTTON_GAP 22
+#define HOME_TITLE_MIN_Y 36
+#define HOME_TITLE_MAX_Y 72
+#define HOME_TITLE_BUTTON_GAP 48
+#define HOME_BOTTOM_MARGIN 20
+
+static int screen_home_clamp_int(int value, int min_value, int max_value) {
+    if (value < min_value) {
+        return min_value;
+    }
+    if (value > max_value) {
+        return max_value;
+    }
+    return value;
+}
+
+static int screen_home_title_scale(const AppState* app) {
+    return app->screenWidth < 420 ? 3 : 4;
+}
+
+static int screen_home_title_y(const AppState* app) {
+    return screen_home_clamp_int(app->screenHeight / 12, HOME_TITLE_MIN_Y, HOME_TITLE_MAX_Y);
+}
+
+static int screen_home_buttons_start_y(const AppState* app) {
+    int title_scale = screen_home_title_scale(app);
+    int title_height = 16 * title_scale;
+    int min_start_y = screen_home_title_y(app) + title_height + HOME_TITLE_BUTTON_GAP;
+    int total_height = HOME_BUTTON_COUNT * HOME_BUTTON_HEIGHT
+            + (HOME_BUTTON_COUNT - 1) * HOME_BUTTON_GAP;
+    int available_height = app->screenHeight - min_start_y - HOME_BOTTOM_MARGIN;
+
+    if (available_height > total_height) {
+        return min_start_y + (available_height - total_height) / 2;
+    }
+
+    return min_start_y;
+}
 
 static UiRect screen_home_button_rect(const AppState* app, int index) {
-    int width = app->screenWidth < 520 ? app->screenWidth - 48 : 520;
-    int height = 58;
-    int gap = 14;
-    int total_height = HOME_BUTTON_COUNT * height + (HOME_BUTTON_COUNT - 1) * gap;
-    int start_y = (app->screenHeight - total_height) / 2 + 34;
+    int width = app->screenWidth - 64;
+    int max_width = 760;
+    int start_y = screen_home_buttons_start_y(app);
     UiRect rect;
 
-    if (width < 220) {
-        width = 220;
+    if (width > max_width) {
+        width = max_width;
+    }
+    if (width < 280) {
+        width = 280;
     }
 
     rect.x = (app->screenWidth - width) / 2;
-    rect.y = start_y + index * (height + gap);
+    rect.y = start_y + index * (HOME_BUTTON_HEIGHT + HOME_BUTTON_GAP);
     rect.width = width;
-    rect.height = height;
+    rect.height = HOME_BUTTON_HEIGHT;
     return rect;
 }
 
 void screen_home_render(Framebuffer* framebuffer, const AppState* app) {
     const PackedFont* font = font_registry_find("vector_16_basic");
-    const char* labels[HOME_BUTTON_COUNT] = {
-            "Local Game",
-            "Create Online Game",
-            "Join Online Game",
-            "My Games",
-            "Settings"
+    const LocalizedTextId label_ids[HOME_BUTTON_COUNT] = {
+            LOCALIZED_TEXT_LOCAL_GAME,
+            LOCALIZED_TEXT_CREATE_ONLINE_GAME,
+            LOCALIZED_TEXT_JOIN_ONLINE_GAME,
+            LOCALIZED_TEXT_MY_GAMES,
+            LOCALIZED_TEXT_SETTINGS
     };
-    int title_scale = app->screenWidth < 420 ? 3 : 4;
-    int title_width = font_measure_text(font, title_scale, "Cat Chess");
-    int title_y = app->screenHeight / 2 - 220;
-
-    if (title_y < 36) {
-        title_y = 36;
-    }
+    const char* title = localization_text(app->settings.locale, LOCALIZED_TEXT_APP_NAME);
+    int title_scale = screen_home_title_scale(app);
+    int title_width = font_measure_text(font, title_scale, title);
+    int title_y = screen_home_title_y(app);
 
     ui_draw_label(
             framebuffer,
@@ -48,11 +87,17 @@ void screen_home_render(Framebuffer* framebuffer, const AppState* app) {
             title_y,
             title_scale,
             0x27312bffu,
-            "Cat Chess"
+            title
     );
 
     for (int index = 0; index < HOME_BUTTON_COUNT; ++index) {
-        ui_draw_button(framebuffer, font, screen_home_button_rect(app, index), labels[index]);
+        ui_draw_button_scaled(
+                framebuffer,
+                font,
+                screen_home_button_rect(app, index),
+                localization_text(app->settings.locale, label_ids[index]),
+                HOME_BUTTON_FONT_SCALE
+        );
     }
 }
 

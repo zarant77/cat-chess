@@ -1,8 +1,18 @@
+import cors from "@fastify/cors";
 import Fastify from "fastify";
 import { seedInviteCodes } from "./games/inviteCodes.js";
+import { registerErrorHandler } from "./http/errorHandler.js";
 import { registerRoutes } from "./routes.js";
 
-const app = Fastify({ logger: true });
+const app = Fastify({
+  logger: true,
+});
+
+registerErrorHandler(app);
+
+await app.register(cors, {
+  origin: true,
+});
 
 seedInviteCodes();
 

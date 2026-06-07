@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "dev": "pnpm dev:server",
+    "dev": "concurrently -n server,web -c blue,green \"pnpm dev:server\" \"pnpm dev:web\"",
     "dev:server": "pnpm --dir server dev",
     "dev:web": "pnpm --dir apps/web dev",
     "build": "pnpm build:server && pnpm build:web",
@@ -18,5 +18,7 @@
     "test:server": "pnpm --dir server test",
     "test:server:watch": "pnpm --dir server test:watch"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }

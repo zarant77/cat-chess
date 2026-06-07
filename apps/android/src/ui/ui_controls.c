@@ -346,6 +346,35 @@ void ui_draw_button_colored(
     ui_draw_label(framebuffer, font, text_x, text_y, scale, UI_COLOR_TEXT, label);
 }
 
+void ui_draw_button_scaled(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect rect,
+        const char* label,
+        int scale
+)
+{
+    int text_width;
+    int text_height;
+    int text_x;
+    int text_y;
+
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, UI_COLOR_BUTTON);
+    ui_draw_rect_outline(framebuffer, rect, UI_BUTTON_BORDER_SIZE, UI_COLOR_BUTTON_BORDER);
+
+    if (font == 0 || label == 0 || scale <= 0)
+    {
+        return;
+    }
+
+    text_width = ui_text_width(font, scale, label);
+    text_height = (int)font->grid_size * scale;
+    text_x = rect.x + (rect.width - text_width) / 2;
+    text_y = rect.y + (rect.height - text_height) / 2;
+
+    ui_draw_label(framebuffer, font, text_x, text_y, scale, UI_COLOR_TEXT, label);
+}
+
 void ui_draw_slider(
         Framebuffer* framebuffer,
         const PackedFont* font,

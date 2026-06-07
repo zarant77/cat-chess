@@ -1,7 +1,7 @@
 #ifndef CAT_CHESS_ONLINE_GAME_H
 #define CAT_CHESS_ONLINE_GAME_H
 
-#define CAT_CHESS_INVITE_CODE_MAX 32
+#include "cat_chess_models.h"
 
 typedef enum {
     ONLINE_GAME_PLACEHOLDER_IDLE = 0,
@@ -10,8 +10,9 @@ typedef enum {
 } OnlineGamePlaceholderState;
 
 typedef struct {
-    int gameId;
-    char inviteCode[CAT_CHESS_INVITE_CODE_MAX];
+    CatChessGameDto game;
+    CatChessMoveDto moves[CAT_CHESS_MOVE_LIST_MAX];
+    int move_count;
     OnlineGamePlaceholderState state;
 } OnlineGame;
 

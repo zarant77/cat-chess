@@ -5,6 +5,35 @@
 #include "../chess_board_view.h"
 #include "../ui_controls.h"
 
+static LocalizedTextId screen_local_game_message_text(LocalGameMessage message) {
+    if (message == LOCAL_GAME_MESSAGE_AI_THINKING) {
+        return LOCALIZED_TEXT_AI_THINKING;
+    }
+    if (message == LOCAL_GAME_MESSAGE_ILLEGAL_MOVE) {
+        return LOCALIZED_TEXT_ILLEGAL_MOVE;
+    }
+    if (message == LOCAL_GAME_MESSAGE_CHECK) {
+        return LOCALIZED_TEXT_CHECK;
+    }
+    if (message == LOCAL_GAME_MESSAGE_CHECKMATE) {
+        return LOCALIZED_TEXT_CHECKMATE;
+    }
+    if (message == LOCAL_GAME_MESSAGE_STALEMATE) {
+        return LOCALIZED_TEXT_STALEMATE;
+    }
+    if (message == LOCAL_GAME_MESSAGE_YOU_WON) {
+        return LOCALIZED_TEXT_YOU_WIN;
+    }
+    if (message == LOCAL_GAME_MESSAGE_YOU_LOST) {
+        return LOCALIZED_TEXT_YOU_LOSE;
+    }
+    if (message == LOCAL_GAME_MESSAGE_DRAW) {
+        return LOCALIZED_TEXT_DRAW;
+    }
+
+    return LOCALIZED_TEXT_YOUR_MOVE;
+}
+
 static UiRect screen_local_game_back_rect(void) {
     UiRect rect;
     rect.x = 20;
@@ -16,13 +45,11 @@ static UiRect screen_local_game_back_rect(void) {
 
 void screen_local_game_render(Framebuffer* framebuffer, const AppState* app) {
     const PackedFont* font = font_registry_find("vector_16_basic");
-    const char* side = localization_text(
+    const char* status = localization_text(
             app->settings.locale,
-            app->localGame.board.sideToMove == CHESS_COLOR_WHITE
-                    ? LOCALIZED_TEXT_WHITE_TO_MOVE
-                    : LOCALIZED_TEXT_BLACK_TO_MOVE
+            screen_local_game_message_text(app->localGameMessage)
     );
-    int text_width = font_measure_text(font, 2, side);
+    int text_width = font_measure_text(font, 2, status);
 
     chess_board_view_render(framebuffer, &app->localGame, app->selectedSquare, app->lastTappedSquare);
     ui_draw_button_scaled(
@@ -39,7 +66,7 @@ void screen_local_game_render(Framebuffer* framebuffer, const AppState* app) {
             88,
             2,
             0x27312bffu,
-            side
+            status
     );
 }
 

@@ -29,9 +29,23 @@ typedef enum {
     NETWORK_STATUS_ERROR
 } NetworkStatus;
 
+typedef enum {
+    LOCAL_GAME_MESSAGE_YOUR_MOVE = 0,
+    LOCAL_GAME_MESSAGE_AI_THINKING,
+    LOCAL_GAME_MESSAGE_ILLEGAL_MOVE,
+    LOCAL_GAME_MESSAGE_CHECK,
+    LOCAL_GAME_MESSAGE_CHECKMATE,
+    LOCAL_GAME_MESSAGE_STALEMATE,
+    LOCAL_GAME_MESSAGE_YOU_WON,
+    LOCAL_GAME_MESSAGE_YOU_LOST,
+    LOCAL_GAME_MESSAGE_DRAW
+} LocalGameMessage;
+
 typedef struct {
     AppScreen currentScreen;
     ChessGame localGame;
+    LocalGameMessage localGameMessage;
+    int localGameOver;
     GameSettings settings;
     CatChessApiClient apiClient;
     OnlineGame onlineGame;

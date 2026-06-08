@@ -43,7 +43,7 @@ int chess_board_view_square_at(int screen_width, int screen_height, float x, flo
     }
 
     file = ((int)x - layout.x) / layout.squareSize;
-    rank = ((int)y - layout.y) / layout.squareSize;
+    rank = CHESS_BOARD_SIZE - 1 - (((int)y - layout.y) / layout.squareSize);
 
     return chess_board_square(file, rank);
 }
@@ -70,11 +70,12 @@ void chess_board_view_render(
     layout = chess_board_view_layout(framebuffer->width, framebuffer->height);
     chess_board_view_draw_border(framebuffer, layout);
 
-    for (int rank = 0; rank < CHESS_BOARD_SIZE; ++rank) {
+    for (int view_rank = 0; view_rank < CHESS_BOARD_SIZE; ++view_rank) {
         for (int file = 0; file < CHESS_BOARD_SIZE; ++file) {
+            int rank = CHESS_BOARD_SIZE - 1 - view_rank;
             int square = chess_board_square(file, rank);
             int x = layout.x + file * layout.squareSize;
-            int y = layout.y + rank * layout.squareSize;
+            int y = layout.y + view_rank * layout.squareSize;
             uint32_t color = ((file + rank) & 1) ? 0x6d8c6affu : 0xe8d9b7ffu;
 
             renderer_draw_color_rect(framebuffer, x, y, layout.squareSize, layout.squareSize, color);

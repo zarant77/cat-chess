@@ -372,9 +372,9 @@ void cat_chess_api_build_uci(int from_square, int to_square, char promotion, cha
     }
 
     out_uci[0] = (char)('a' + from_file);
-    out_uci[1] = (char)('8' - from_rank);
+    out_uci[1] = (char)('1' + from_rank);
     out_uci[2] = (char)('a' + to_file);
-    out_uci[3] = (char)('8' - to_rank);
+    out_uci[3] = (char)('1' + to_rank);
     if (promotion != '\0') {
         out_uci[4] = promotion;
     }

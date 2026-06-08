@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "../audio/chess_sound.h"
+#include "../chess/chess_ai.h"
+#include "../chess/chess_rules.h"
 #include "../online/cat_chess_api_config.h"
 #include "../online/cat_chess_models.h"
 #include "../storage/local_storage.h"
@@ -20,6 +22,45 @@ static void app_clear_selection(AppState* app) {
     app->hasSelection = 0;
 }
 
+static void app_start_local_game(AppState* app) {
+    if (app == 0) {
+        return;
+    }
+
+    chess_game_init(&app->localGame);
+    app->localGameMessage = LOCAL_GAME_MESSAGE_YOUR_MOVE;
+    app->localGameOver = 0;
+    app->lastTappedSquare = -1;
+    app_clear_selection(app);
+}
+
+static void app_update_local_game_message(AppState* app, ChessColor last_mover) {
+    ChessGameStatus status;
+
+    if (app == 0) {
+        return;
+    }
+
+    status = chess_get_game_status(&app->localGame.board);
+    if (status == CHESS_GAME_CHECKMATE) {
+        app->localGameOver = 1;
+        app->localGameMessage = last_mover == CHESS_COLOR_WHITE
+                ? LOCAL_GAME_MESSAGE_YOU_WON
+                : LOCAL_GAME_MESSAGE_YOU_LOST;
+        return;
+    }
+    if (status == CHESS_GAME_STALEMATE) {
+        app->localGameOver = 1;
+        app->localGameMessage = LOCAL_GAME_MESSAGE_DRAW;
+        return;
+    }
+
+    app->localGameOver = 0;
+    app->localGameMessage = chess_is_in_check(&app->localGame.board, app->localGame.board.side_to_move)
+            ? LOCAL_GAME_MESSAGE_CHECK
+            : LOCAL_GAME_MESSAGE_YOUR_MOVE;
+}
+
 void app_init(AppState* app) {
     char device_secret[CAT_CHESS_DEVICE_SECRET_MAX];
 
@@ -29,6 +70,8 @@ void app_init(AppState* app) {
 
     app->currentScreen = APP_SCREEN_HOME;
     chess_game_init(&app->localGame);
+    app->localGameMessage = LOCAL_GAME_MESSAGE_YOUR_MOVE;
+    app->localGameOver = 0;
     game_settings_init(&app->settings);
     cat_chess_api_init(&app->apiClient, CAT_CHESS_API_BASE_URL);
     online_game_init(&app->onlineGame);
@@ -88,7 +131,7 @@ void app_navigate(AppState* app, AppScreen screen) {
     app_clear_selection(app);
     app->inviteInputFocused = 0;
     if (screen == APP_SCREEN_LOCAL_GAME) {
-        app->lastTappedSquare = -1;
+        app_start_local_game(app);
     } else if (screen == APP_SCREEN_GAME) {
         app->lastTappedSquare = -1;
     }
@@ -233,9 +276,15 @@ int app_take_soft_keyboard_request(AppState* app) {
 static void app_handle_local_game_tap(AppState* app, int x, int y) {
     int square;
     ChessPiece piece;
+    ChessPiece moving;
     ChessPiece target;
+    ChessMove human_move;
 
     if (app == 0) {
+        return;
+    }
+
+    if (app->localGameOver || app->localGame.board.side_to_move != CHESS_COLOR_WHITE) {
         return;
     }
 
@@ -249,7 +298,7 @@ static void app_handle_local_game_tap(AppState* app, int x, int y) {
     piece = chess_board_get_piece(&app->localGame.board, square);
 
     if (!app->hasSelection) {
-        if (piece.type != CHESS_PIECE_NONE && piece.color == app->localGame.board.sideToMove) {
+        if (piece.type != CHESS_PIECE_NONE && piece.color == CHESS_COLOR_WHITE) {
             app->selectedSquare = square;
             app->hasSelection = 1;
         }
@@ -262,14 +311,45 @@ static void app_handle_local_game_tap(AppState* app, int x, int y) {
     }
 
     target = chess_board_get_piece(&app->localGame.board, square);
-    if (!chess_board_move_piece(&app->localGame.board, app->selectedSquare, square)) {
+    if (target.type != CHESS_PIECE_NONE && target.color == CHESS_COLOR_WHITE) {
+        app->selectedSquare = square;
+        app->hasSelection = 1;
+        return;
+    }
+
+    moving = chess_board_get_piece(&app->localGame.board, app->selectedSquare);
+    human_move.from = app->selectedSquare;
+    human_move.to = square;
+    human_move.promotion = CHESS_PIECE_NONE;
+    if (moving.type == CHESS_PIECE_PAWN && chess_board_rank(square) == 7) {
+        human_move.promotion = CHESS_PIECE_QUEEN;
+    }
+
+    if (!chess_apply_move(&app->localGame.board, &human_move)) {
         chess_sound_play(CHESS_SOUND_ILLEGAL_MOVE);
+        app->localGameMessage = LOCAL_GAME_MESSAGE_ILLEGAL_MOVE;
         app_clear_selection(app);
         return;
     }
 
     chess_sound_play(target.type == CHESS_PIECE_NONE ? CHESS_SOUND_MOVE : CHESS_SOUND_CAPTURE);
     app_clear_selection(app);
+    app_update_local_game_message(app, CHESS_COLOR_WHITE);
+
+    if (!app->localGameOver && app->localGame.board.side_to_move == CHESS_COLOR_BLACK) {
+        ChessMove ai_move;
+        ChessPiece ai_target;
+
+        app->localGameMessage = LOCAL_GAME_MESSAGE_AI_THINKING;
+        if (chess_ai_choose_move(&app->localGame.board, CHESS_AI_NORMAL, &ai_move)) {
+            ai_target = chess_board_get_piece(&app->localGame.board, ai_move.to);
+            chess_apply_move(&app->localGame.board, &ai_move);
+            chess_sound_play(ai_target.type == CHESS_PIECE_NONE ? CHESS_SOUND_MOVE : CHESS_SOUND_CAPTURE);
+            app_update_local_game_message(app, CHESS_COLOR_BLACK);
+        } else {
+            app_update_local_game_message(app, CHESS_COLOR_WHITE);
+        }
+    }
 }
 
 void app_update(AppState* app, const InputState* input, float dt) {

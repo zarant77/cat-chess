@@ -50,6 +50,7 @@ add_library(cat_chess SHARED
     ../../../../src/audio/chess_sound.c
     ../../../../src/chess/chess_ai.c
     ../../../../src/chess/chess_board.c
+    ../../../../src/chess/chess_fen.c
     ../../../../src/chess/chess_game.c
     ../../../../src/chess/chess_move.c
     ../../../../src/chess/chess_rules.c

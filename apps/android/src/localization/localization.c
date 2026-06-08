@@ -76,6 +76,8 @@ static const LocalizedText LOCALIZED_TEXTS[] = {
     [LOCALIZED_TEXT_BLACK_WON] = {"BLACK WON", "ЧОРНІ ПЕРЕМОГЛИ"},
     [LOCALIZED_TEXT_VS_COMPUTER] = {"VS COMPUTER", "ПРОТИ КОМП'ЮТЕРА"},
     [LOCALIZED_TEXT_THINKING] = {"THINKING", "ДУМАЮ"},
+    [LOCALIZED_TEXT_YOUR_MOVE] = {"YOUR MOVE", "ВАШ ХІД"},
+    [LOCALIZED_TEXT_AI_THINKING] = {"AI THINKING", "AI ДУМАЄ"},
     [LOCALIZED_TEXT_YOU_WIN] = {"YOU WIN", "ВИ ПЕРЕМОГЛИ"},
     [LOCALIZED_TEXT_YOU_LOSE] = {"YOU LOSE", "ВИ ПРОГРАЛИ"},
 };

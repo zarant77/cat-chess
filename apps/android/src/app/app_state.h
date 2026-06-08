@@ -35,8 +35,10 @@ typedef struct {
     GameSettings settings;
     CatChessApiClient apiClient;
     OnlineGame onlineGame;
-    CatChessGameDto games[CAT_CHESS_GAME_LIST_MAX];
-    int gameCount;
+    CatChessGameListDto games;
+    CatChessApiStatus lastApiStatus;
+    char inviteCode[CAT_CHESS_INVITE_CODE_MAX];
+    int inviteInputFocused;
     int selectedSquare;
     int lastTappedSquare;
     int hasSelection;

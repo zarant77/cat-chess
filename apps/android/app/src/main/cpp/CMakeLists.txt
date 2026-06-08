@@ -59,6 +59,7 @@ add_library(cat_chess SHARED
     ../../../../src/localization/localization.c
     ../../../../src/main.c
     ../../../../src/online/cat_chess_api.c
+    ../../../../src/online/cat_chess_json.c
     ../../../../src/online/cat_chess_models.c
     ../../../../src/online/online_game.c
     ../../../../src/platform/platform_android.c

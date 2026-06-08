@@ -11,6 +11,8 @@ void input_init(InputState* input) {
     input->touchActive = 0;
     input->tapReleased = 0;
     input->backPressed = 0;
+    input->textCharCount = 0;
+    input->textBackspace = 0;
     input->touchX = 0.0f;
     input->touchY = 0.0f;
     input->tapX = 0.0f;
@@ -75,6 +77,8 @@ void input_end_frame(InputState* input) {
 
     input->tapReleased = 0;
     input->backPressed = 0;
+    input->textCharCount = 0;
+    input->textBackspace = 0;
 }
 
 void input_handle_back(InputState* input) {
@@ -83,4 +87,21 @@ void input_handle_back(InputState* input) {
     }
 
     input->backPressed = 1;
+}
+
+void input_handle_text_char(InputState* input, char value) {
+    if (input == 0 || input->textCharCount >= (int)sizeof(input->textChars)) {
+        return;
+    }
+
+    input->textChars[input->textCharCount] = value;
+    input->textCharCount += 1;
+}
+
+void input_handle_text_backspace(InputState* input) {
+    if (input == 0) {
+        return;
+    }
+
+    input->textBackspace = 1;
 }

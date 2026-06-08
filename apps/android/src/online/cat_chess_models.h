@@ -1,14 +1,17 @@
 #ifndef CAT_CHESS_MODELS_H
 #define CAT_CHESS_MODELS_H
 
-#define CAT_CHESS_BASE_URL_ANDROID_EMULATOR "http://10.0.2.2:5400"
 #define CAT_CHESS_DEVICE_SECRET_MAX 64
 #define CAT_CHESS_INVITE_CODE_MAX 16
-#define CAT_CHESS_BOARD_FEN_MAX 128
+#define CAT_CHESS_FEN_MAX 128
+#define CAT_CHESS_BOARD_FEN_MAX CAT_CHESS_FEN_MAX
 #define CAT_CHESS_UCI_MAX 8
-#define CAT_CHESS_API_ERROR_CODE_MAX 64
-#define CAT_CHESS_GAME_LIST_MAX 16
-#define CAT_CHESS_MOVE_LIST_MAX 64
+#define CAT_CHESS_ERROR_CODE_MAX 64
+#define CAT_CHESS_API_ERROR_CODE_MAX CAT_CHESS_ERROR_CODE_MAX
+#define CAT_CHESS_MAX_GAMES 64
+#define CAT_CHESS_MAX_MOVES 256
+#define CAT_CHESS_GAME_LIST_MAX CAT_CHESS_MAX_GAMES
+#define CAT_CHESS_MOVE_LIST_MAX CAT_CHESS_MAX_MOVES
 
 typedef enum {
     CAT_CHESS_GAME_STATUS_WAITING_FOR_BLACK = 0,
@@ -28,7 +31,8 @@ typedef enum {
 typedef enum {
     CAT_CHESS_PLAYER_COLOR_WHITE = 0,
     CAT_CHESS_PLAYER_COLOR_BLACK,
-    CAT_CHESS_PLAYER_COLOR_NONE
+    CAT_CHESS_PLAYER_COLOR_NONE,
+    CAT_CHESS_PLAYER_COLOR_UNKNOWN
 } CatChessPlayerColor;
 
 typedef struct {
@@ -55,8 +59,20 @@ typedef struct {
     long created_at;
 } CatChessMoveDto;
 
+typedef struct {
+    CatChessGameDto items[CAT_CHESS_MAX_GAMES];
+    int count;
+} CatChessGameListDto;
+
+typedef struct {
+    CatChessMoveDto items[CAT_CHESS_MAX_MOVES];
+    int count;
+} CatChessMoveListDto;
+
 void cat_chess_game_dto_init(CatChessGameDto* game);
 void cat_chess_move_dto_init(CatChessMoveDto* move);
+void cat_chess_game_list_dto_init(CatChessGameListDto* games);
+void cat_chess_move_list_dto_init(CatChessMoveListDto* moves);
 const char* cat_chess_game_status_string(CatChessGameStatus status);
 const char* cat_chess_game_result_string(CatChessGameResult result);
 const char* cat_chess_player_color_string(CatChessPlayerColor color);

@@ -11,8 +11,7 @@ typedef enum {
 
 typedef struct {
     CatChessGameDto game;
-    CatChessMoveDto moves[CAT_CHESS_MOVE_LIST_MAX];
-    int move_count;
+    CatChessMoveListDto moves;
     OnlineGamePlaceholderState state;
 } OnlineGame;
 

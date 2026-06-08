@@ -11,8 +11,10 @@
 #include "../config.h"
 #include "../app/app.h"
 #include "../input/input.h"
+#include "../online/cat_chess_api.h"
 #include "../renderer/renderer.h"
 #include "../sprites/generated_sprite.h"
+#include "../storage/local_storage.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, CAT_CHESS_LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, CAT_CHESS_LOG_TAG, __VA_ARGS__)
@@ -126,15 +128,33 @@ static void platform_handle_motion_event(
 }
 
 static int platform_handle_key_event(AndroidPlatform* platform, AInputEvent* event) {
-    if (AKeyEvent_getKeyCode(event) != AKEYCODE_BACK) {
-        return 0;
+    int key_code = AKeyEvent_getKeyCode(event);
+    char text_char = '\0';
+
+    if (key_code == AKEYCODE_BACK && AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
+        input_handle_back(&platform->input);
+        return 1;
     }
 
     if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
-        input_handle_back(&platform->input);
+        if (key_code == AKEYCODE_DEL) {
+            input_handle_text_backspace(&platform->input);
+            return 1;
+        }
+
+        if (key_code >= AKEYCODE_A && key_code <= AKEYCODE_Z) {
+            text_char = (char)('A' + key_code - AKEYCODE_A);
+        } else if (key_code >= AKEYCODE_0 && key_code <= AKEYCODE_9) {
+            text_char = (char)('0' + key_code - AKEYCODE_0);
+        }
+
+        if (text_char != '\0') {
+            input_handle_text_char(&platform->input, text_char);
+            return 1;
+        }
     }
 
-    return 1;
+    return key_code == AKEYCODE_BACK;
 }
 
 static void platform_process_input(AndroidPlatform* platform, float screen_width) {
@@ -499,7 +519,9 @@ void platform_android_on_create(
     pthread_mutex_init(&platform->input_queue_mutex, NULL);
     platform->reset_frame_time = 1;
 
+    cat_chess_api_bind_android(activity->vm, activity->clazz);
     generated_sprite_initialize_all();
+    local_storage_set_base_path(activity->internalDataPath);
     app_init(&platform->app);
     input_init(&platform->input);
 

@@ -32,6 +32,28 @@ void cat_chess_move_dto_init(CatChessMoveDto* move) {
     move->created_at = 0;
 }
 
+void cat_chess_game_list_dto_init(CatChessGameListDto* games) {
+    if (games == 0) {
+        return;
+    }
+
+    games->count = 0;
+    for (int index = 0; index < CAT_CHESS_MAX_GAMES; ++index) {
+        cat_chess_game_dto_init(games->items + index);
+    }
+}
+
+void cat_chess_move_list_dto_init(CatChessMoveListDto* moves) {
+    if (moves == 0) {
+        return;
+    }
+
+    moves->count = 0;
+    for (int index = 0; index < CAT_CHESS_MAX_MOVES; ++index) {
+        cat_chess_move_dto_init(moves->items + index);
+    }
+}
+
 const char* cat_chess_game_status_string(CatChessGameStatus status) {
     if (status == CAT_CHESS_GAME_STATUS_WAITING_FOR_BLACK) {
         return "waiting_for_black";
@@ -67,6 +89,9 @@ const char* cat_chess_player_color_string(CatChessPlayerColor color) {
     }
     if (color == CAT_CHESS_PLAYER_COLOR_BLACK) {
         return "black";
+    }
+    if (color == CAT_CHESS_PLAYER_COLOR_UNKNOWN) {
+        return "unknown";
     }
     return "none";
 }

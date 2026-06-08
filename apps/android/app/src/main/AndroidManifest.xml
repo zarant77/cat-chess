@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:hasCode="false"
+        android:hasCode="true"
         android:label="CAT CHESS"
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
         android:allowBackup="false"
         android:supportsRtl="false"
+        android:usesCleartextTraffic="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
         <activity

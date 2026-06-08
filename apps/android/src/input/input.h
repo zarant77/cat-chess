@@ -6,6 +6,9 @@ typedef struct {
     int touchActive;
     int tapReleased;
     int backPressed;
+    int textCharCount;
+    char textChars[8];
+    int textBackspace;
     float touchX;
     float touchY;
     float tapX;
@@ -28,5 +31,7 @@ void input_handle_touch(
 );
 void input_end_frame(InputState* input);
 void input_handle_back(InputState* input);
+void input_handle_text_char(InputState* input, char value);
+void input_handle_text_backspace(InputState* input);
 
 #endif

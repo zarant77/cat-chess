@@ -101,7 +101,7 @@ void screen_game_render(Framebuffer* framebuffer, const AppState* app) {
     y += 34;
     screen_game_draw_row(framebuffer, font, x, y, localization_text(app->settings.locale, LOCALIZED_TEXT_BOARD_FEN), game->board_fen);
     y += 34;
-    snprintf(moves_text, sizeof(moves_text), "%d", app->onlineGame.move_count);
+    snprintf(moves_text, sizeof(moves_text), "%d", app->onlineGame.moves.count);
     screen_game_draw_row(framebuffer, font, x, y, localization_text(app->settings.locale, LOCALIZED_TEXT_MOVES), moves_text);
     y += 52;
     screen_game_draw_row(
@@ -140,7 +140,11 @@ void screen_game_handle_tap(AppState* app, int x, int y) {
 
     resign_rect = screen_game_resign_rect(app);
     if (ui_rect_contains(&resign_rect, x, y)) {
-        cat_chess_api_resign_game(&app->apiClient, app->onlineGame.game.id, &app->onlineGame.game);
-        app->networkStatus = NETWORK_STATUS_NOT_IMPLEMENTED;
+        app->lastApiStatus = cat_chess_api_resign_game(&app->apiClient, app->onlineGame.game.id, &app->onlineGame.game);
+        if (app->lastApiStatus.result == CAT_CHESS_API_OK) {
+            app_refresh_online_game(app);
+        } else {
+            app->networkStatus = NETWORK_STATUS_ERROR;
+        }
     }
 }

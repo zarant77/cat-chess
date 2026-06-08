@@ -1,6 +1,9 @@
 #include "app.h"
 
+#include <string.h>
+
 #include "../audio/chess_sound.h"
+#include "../online/cat_chess_api_config.h"
 #include "../online/cat_chess_models.h"
 #include "../storage/local_storage.h"
 #include "../ui/chess_board_view.h"
@@ -27,12 +30,14 @@ void app_init(AppState* app) {
     app->currentScreen = APP_SCREEN_HOME;
     chess_game_init(&app->localGame);
     game_settings_init(&app->settings);
-    cat_chess_api_init(&app->apiClient, CAT_CHESS_BASE_URL_ANDROID_EMULATOR);
+    cat_chess_api_init(&app->apiClient, CAT_CHESS_API_BASE_URL);
     online_game_init(&app->onlineGame);
-    app->gameCount = 0;
-    for (int index = 0; index < CAT_CHESS_GAME_LIST_MAX; ++index) {
-        cat_chess_game_dto_init(app->games + index);
-    }
+    cat_chess_game_list_dto_init(&app->games);
+    app->lastApiStatus.result = CAT_CHESS_API_OK;
+    app->lastApiStatus.http_status = 0;
+    app->lastApiStatus.error_code[0] = '\0';
+    app->inviteCode[0] = '\0';
+    app->inviteInputFocused = 0;
     app->selectedSquare = -1;
     app->lastTappedSquare = -1;
     app->hasSelection = 0;
@@ -40,20 +45,21 @@ void app_init(AppState* app) {
         cat_chess_api_set_device_secret(&app->apiClient, device_secret);
         app->deviceSecretStatus = DEVICE_SECRET_STATUS_AVAILABLE;
         app->networkStatus = NETWORK_STATUS_READY;
-    } else if (cat_chess_api_create_or_touch_device(
+    } else {
+        app->lastApiStatus = cat_chess_api_create_or_touch_device(
             &app->apiClient,
             device_secret,
             (int)sizeof(device_secret)
-    ) == CAT_CHESS_API_OK) {
-        local_storage_set_device_secret(device_secret);
-        cat_chess_api_set_device_secret(&app->apiClient, device_secret);
-        app->deviceSecretStatus = DEVICE_SECRET_STATUS_AVAILABLE;
-        app->networkStatus = NETWORK_STATUS_READY;
-    } else {
-        app->deviceSecretStatus = DEVICE_SECRET_STATUS_MISSING;
-        app->networkStatus = app->apiClient.last_response.result == CAT_CHESS_API_NOT_IMPLEMENTED
-                ? NETWORK_STATUS_NOT_IMPLEMENTED
-                : NETWORK_STATUS_ERROR;
+        );
+        if (app->lastApiStatus.result == CAT_CHESS_API_OK) {
+            local_storage_set_device_secret(device_secret);
+            cat_chess_api_set_device_secret(&app->apiClient, device_secret);
+            app->deviceSecretStatus = DEVICE_SECRET_STATUS_AVAILABLE;
+            app->networkStatus = NETWORK_STATUS_READY;
+        } else {
+            app->deviceSecretStatus = DEVICE_SECRET_STATUS_MISSING;
+            app->networkStatus = NETWORK_STATUS_ERROR;
+        }
     }
     app->screenWidth = 0;
     app->screenHeight = 0;
@@ -80,10 +86,114 @@ void app_navigate(AppState* app, AppScreen screen) {
 
     app->currentScreen = screen;
     app_clear_selection(app);
+    app->inviteInputFocused = 0;
     if (screen == APP_SCREEN_LOCAL_GAME) {
         app->lastTappedSquare = -1;
     } else if (screen == APP_SCREEN_GAME) {
         app->lastTappedSquare = -1;
+    }
+}
+
+static int app_ensure_device_secret(AppState* app) {
+    char device_secret[CAT_CHESS_DEVICE_SECRET_MAX];
+
+    if (app == 0) {
+        return 0;
+    }
+
+    if (app->apiClient.device_secret[0] != '\0') {
+        return 1;
+    }
+
+    if (local_storage_get_device_secret(device_secret, (int)sizeof(device_secret))) {
+        cat_chess_api_set_device_secret(&app->apiClient, device_secret);
+        app->deviceSecretStatus = DEVICE_SECRET_STATUS_AVAILABLE;
+        return 1;
+    }
+
+    app->lastApiStatus = cat_chess_api_create_or_touch_device(
+            &app->apiClient,
+            device_secret,
+            (int)sizeof(device_secret)
+    );
+    if (app->lastApiStatus.result != CAT_CHESS_API_OK) {
+        app->networkStatus = NETWORK_STATUS_ERROR;
+        return 0;
+    }
+
+    local_storage_set_device_secret(device_secret);
+    cat_chess_api_set_device_secret(&app->apiClient, device_secret);
+    app->deviceSecretStatus = DEVICE_SECRET_STATUS_AVAILABLE;
+    return 1;
+}
+
+void app_create_online_game(AppState* app) {
+    if (app == 0 || !app_ensure_device_secret(app)) {
+        return;
+    }
+
+    app->onlineGame.state = ONLINE_GAME_PLACEHOLDER_LOADING;
+    app->lastApiStatus = cat_chess_api_create_game(&app->apiClient, &app->onlineGame.game);
+    if (app->lastApiStatus.result == CAT_CHESS_API_OK) {
+        app->onlineGame.state = ONLINE_GAME_PLACEHOLDER_IDLE;
+        app_navigate(app, APP_SCREEN_GAME);
+    } else {
+        app->onlineGame.state = ONLINE_GAME_PLACEHOLDER_ERROR;
+        app->networkStatus = NETWORK_STATUS_ERROR;
+    }
+}
+
+void app_join_online_game(AppState* app) {
+    if (app == 0 || app->inviteCode[0] == '\0' || !app_ensure_device_secret(app)) {
+        return;
+    }
+
+    app->onlineGame.state = ONLINE_GAME_PLACEHOLDER_LOADING;
+    app->lastApiStatus = cat_chess_api_join_game(&app->apiClient, app->inviteCode, &app->onlineGame.game);
+    if (app->lastApiStatus.result == CAT_CHESS_API_OK) {
+        app->onlineGame.state = ONLINE_GAME_PLACEHOLDER_IDLE;
+        app_navigate(app, APP_SCREEN_GAME);
+    } else {
+        app->onlineGame.state = ONLINE_GAME_PLACEHOLDER_ERROR;
+        app->networkStatus = NETWORK_STATUS_ERROR;
+    }
+}
+
+void app_refresh_online_game(AppState* app) {
+    if (app == 0 || app->onlineGame.game.id <= 0 || !app_ensure_device_secret(app)) {
+        return;
+    }
+
+    app->lastApiStatus = cat_chess_api_get_game(&app->apiClient, app->onlineGame.game.id, &app->onlineGame.game);
+    if (app->lastApiStatus.result == CAT_CHESS_API_OK) {
+        app->lastApiStatus = cat_chess_api_get_moves(&app->apiClient, app->onlineGame.game.id, &app->onlineGame.moves);
+    }
+}
+
+static void app_handle_invite_text(AppState* app, const InputState* input) {
+    int length;
+
+    if (app == 0 || input == 0 || !app->inviteInputFocused) {
+        return;
+    }
+
+    length = (int)strlen(app->inviteCode);
+    if (input->textBackspace && length > 0) {
+        length -= 1;
+        app->inviteCode[length] = '\0';
+    }
+
+    for (int index = 0; index < input->textCharCount; ++index) {
+        char value = input->textChars[index];
+        if (value >= 'a' && value <= 'z') {
+            value = (char)(value - 'a' + 'A');
+        }
+        if (((value >= 'A' && value <= 'Z') || (value >= '0' && value <= '9'))
+                && length < CAT_CHESS_INVITE_CODE_MAX - 1) {
+            app->inviteCode[length] = value;
+            length += 1;
+            app->inviteCode[length] = '\0';
+        }
     }
 }
 
@@ -173,6 +283,8 @@ void app_update(AppState* app, const InputState* input, float dt) {
         app_request_back(app);
         return;
     }
+
+    app_handle_invite_text(app, input);
 
     if (!input->tapReleased) {
         return;

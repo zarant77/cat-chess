@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class com.catemup.catchess.HttpClient {
+    public static java.lang.String request(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+}

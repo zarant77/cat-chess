@@ -10,6 +10,7 @@ void cat_chess_game_dto_init(CatChessGameDto* game) {
     game->status = CAT_CHESS_GAME_STATUS_UNKNOWN;
     game->result = CAT_CHESS_GAME_RESULT_NONE;
     game->board_fen[0] = '\0';
+    game->last_move[0] = '\0';
     game->side_to_move = CAT_CHESS_PLAYER_COLOR_NONE;
     game->your_color = CAT_CHESS_PLAYER_COLOR_NONE;
     game->created_at = 0;

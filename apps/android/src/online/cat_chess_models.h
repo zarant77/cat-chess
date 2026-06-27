@@ -41,6 +41,7 @@ typedef struct {
     CatChessGameStatus status;
     CatChessGameResult result;
     char board_fen[CAT_CHESS_BOARD_FEN_MAX];
+    char last_move[CAT_CHESS_UCI_MAX];
     CatChessPlayerColor side_to_move;
     CatChessPlayerColor your_color;
     long created_at;

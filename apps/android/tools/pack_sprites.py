@@ -337,15 +337,6 @@ def load_valid_sprites(files: list[Path]) -> tuple[list[dict[str, Any]], int]:
 
 
 def find_sprite_files() -> list[Path]:
-    chess_dir = SPRITE_ASSETS_DIR / "chess"
-
-    if chess_dir.is_dir():
-        return sorted(
-            file_path
-            for file_path in chess_dir.rglob("*.json")
-            if file_path.is_file()
-        )
-
     return sorted(
         file_path
         for file_path in SPRITE_ASSETS_DIR.rglob("*.json")

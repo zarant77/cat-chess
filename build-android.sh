@@ -70,9 +70,10 @@ EOF
 pack_assets() {
     echo
     echo "Packing assets JSON files..."
-    
+
     (
         cd "$ANDROID_DIR"
+        python3 tools/pack_music.py
         python3 tools/pack_animations.py
         python3 tools/pack_fonts.py
         python3 tools/pack_sprites.py

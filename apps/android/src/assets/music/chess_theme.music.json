@@ -1,0 +1,1129 @@
+{
+  "type": "music",
+  "id": "chess_theme",
+  "bpm": 88,
+  "ticksPerBeat": 4,
+  "lengthTicks": 128,
+  "volume": 0.28,
+  "normalizeVolume": true,
+  "targetAverageVolume": 72,
+  "maxVolumeGain": 2,
+  "loop": {
+    "enabled": true,
+    "startTick": 0,
+    "endTick": 128
+  },
+  "instruments": [
+    {
+      "id": "lead",
+      "wave": "triangle",
+      "volume": 58,
+      "attackMs": 18,
+      "decayMs": 180,
+      "sustain": 170,
+      "releaseMs": 80
+    },
+    {
+      "id": "bass",
+      "wave": "sine",
+      "volume": 68,
+      "attackMs": 12,
+      "decayMs": 220,
+      "sustain": 210,
+      "releaseMs": 120
+    },
+    {
+      "id": "harmony",
+      "wave": "triangle",
+      "volume": 42,
+      "attackMs": 28,
+      "decayMs": 255,
+      "sustain": 150,
+      "releaseMs": 120
+    },
+    {
+      "id": "clock",
+      "wave": "square",
+      "volume": 18,
+      "attackMs": 2,
+      "decayMs": 35,
+      "sustain": 80,
+      "releaseMs": 20
+    },
+    {
+      "id": "warmth",
+      "wave": "sine",
+      "volume": 36,
+      "attackMs": 45,
+      "decayMs": 255,
+      "sustain": 160,
+      "releaseMs": 160
+    }
+  ],
+  "notes": [
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 0,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 0,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 0,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 0,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 0,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 0,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 2,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 4,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 6,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 8,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 57,
+      "startTick": 8,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 8,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 45,
+      "startTick": 8,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 48,
+      "startTick": 8,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 10,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 12,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 12,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 14,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 16,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 41,
+      "startTick": 16,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 16,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 16,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 16,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 16,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 18,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 20,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 22,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 24,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 24,
+      "durationTicks": 2,
+      "volume": 28
+    },
+    {
+      "instrument": 1,
+      "note": 53,
+      "startTick": 24,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 24,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 41,
+      "startTick": 24,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 45,
+      "startTick": 24,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 26,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 26,
+      "durationTicks": 2,
+      "volume": 24
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 28,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 41,
+      "startTick": 28,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 30,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 32,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 48,
+      "startTick": 32,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 55,
+      "startTick": 32,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 32,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 32,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 32,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 34,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 36,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 38,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 79,
+      "startTick": 40,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 60,
+      "startTick": 40,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 40,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 43,
+      "startTick": 40,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 48,
+      "startTick": 40,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 42,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 44,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 48,
+      "startTick": 44,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 46,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 48,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 43,
+      "startTick": 48,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 55,
+      "startTick": 48,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 59,
+      "startTick": 48,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 62,
+      "startTick": 48,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 48,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 50,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 52,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 79,
+      "startTick": 54,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 78,
+      "startTick": 56,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 0,
+      "note": 79,
+      "startTick": 56,
+      "durationTicks": 2,
+      "volume": 28
+    },
+    {
+      "instrument": 1,
+      "note": 55,
+      "startTick": 56,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 56,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 43,
+      "startTick": 56,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 47,
+      "startTick": 56,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 58,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 78,
+      "startTick": 58,
+      "durationTicks": 2,
+      "volume": 24
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 60,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 43,
+      "startTick": 60,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 62,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 64,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 64,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 64,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 64,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 64,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 64,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 66,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 79,
+      "startTick": 68,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 70,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 72,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 57,
+      "startTick": 72,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 72,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 45,
+      "startTick": 72,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 48,
+      "startTick": 72,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 74,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 76,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 45,
+      "startTick": 76,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 78,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 80,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 41,
+      "startTick": 80,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 53,
+      "startTick": 80,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 57,
+      "startTick": 80,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 80,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 80,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 82,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 84,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 86,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 88,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 88,
+      "durationTicks": 2,
+      "volume": 26
+    },
+    {
+      "instrument": 1,
+      "note": 53,
+      "startTick": 88,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 88,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 41,
+      "startTick": 88,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 45,
+      "startTick": 88,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 69,
+      "startTick": 90,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 90,
+      "durationTicks": 2,
+      "volume": 24
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 92,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 41,
+      "startTick": 92,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 65,
+      "startTick": 94,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 96,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 48,
+      "startTick": 96,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 55,
+      "startTick": 96,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 60,
+      "startTick": 96,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 64,
+      "startTick": 96,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 96,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 98,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 100,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 102,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 79,
+      "startTick": 104,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 60,
+      "startTick": 104,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 104,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 43,
+      "startTick": 104,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 48,
+      "startTick": 104,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 83,
+      "startTick": 106,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 79,
+      "startTick": 108,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 48,
+      "startTick": 108,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 76,
+      "startTick": 110,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 74,
+      "startTick": 112,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 1,
+      "note": 43,
+      "startTick": 112,
+      "durationTicks": 8,
+      "volume": 54
+    },
+    {
+      "instrument": 2,
+      "note": 55,
+      "startTick": 112,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 59,
+      "startTick": 112,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 2,
+      "note": 62,
+      "startTick": 112,
+      "durationTicks": 12,
+      "volume": 26
+    },
+    {
+      "instrument": 3,
+      "note": 76,
+      "startTick": 112,
+      "durationTicks": 1,
+      "volume": 15
+    },
+    {
+      "instrument": 0,
+      "note": 72,
+      "startTick": 114,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 71,
+      "startTick": 116,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 118,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 120,
+      "durationTicks": 2,
+      "volume": 44
+    },
+    {
+      "instrument": 0,
+      "note": 67,
+      "startTick": 120,
+      "durationTicks": 2,
+      "volume": 26
+    },
+    {
+      "instrument": 1,
+      "note": 55,
+      "startTick": 120,
+      "durationTicks": 4,
+      "volume": 34
+    },
+    {
+      "instrument": 3,
+      "note": 72,
+      "startTick": 120,
+      "durationTicks": 1,
+      "volume": 12
+    },
+    {
+      "instrument": 4,
+      "note": 43,
+      "startTick": 120,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 4,
+      "note": 47,
+      "startTick": 120,
+      "durationTicks": 8,
+      "volume": 20
+    },
+    {
+      "instrument": 0,
+      "note": 62,
+      "startTick": 122,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 0,
+      "note": 64,
+      "startTick": 122,
+      "durationTicks": 2,
+      "volume": 24
+    },
+    {
+      "instrument": 0,
+      "note": 60,
+      "startTick": 124,
+      "durationTicks": 2,
+      "volume": 36
+    },
+    {
+      "instrument": 1,
+      "note": 43,
+      "startTick": 124,
+      "durationTicks": 4,
+      "volume": 42
+    },
+    {
+      "instrument": 0,
+      "note": 59,
+      "startTick": 126,
+      "durationTicks": 2,
+      "volume": 36
+    }
+  ]
+}

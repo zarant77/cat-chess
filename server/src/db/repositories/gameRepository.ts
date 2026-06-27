@@ -156,15 +156,27 @@ export function findGameByIdForDevice(gameId: number, deviceHash: string): GameR
     .get(gameId, deviceHash, deviceHash) as GameRow | undefined;
 }
 
-export function updateGameAfterMove(gameId: number, nextSideToMove: PlayerColor, now: number): void {
+export function updateGameAfterMove(
+  gameId: number,
+  boardFen: string,
+  nextSideToMove: PlayerColor,
+  status: GameStatus,
+  result: GameResult | null,
+  finishedAt: number | null,
+  now: number,
+): void {
   db.prepare(
     `
     UPDATE games
-    SET side_to_move = ?,
-        updated_at = ?
+    SET board_fen = ?,
+        side_to_move = ?,
+        status = ?,
+        result = ?,
+        updated_at = ?,
+        finished_at = ?
     WHERE id = ?
   `,
-  ).run(nextSideToMove, now, gameId);
+  ).run(boardFen, nextSideToMove, status, result, now, finishedAt, gameId);
 }
 
 export function finishGame(gameId: number, result: GameResult, now: number): void {

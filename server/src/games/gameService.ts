@@ -13,15 +13,18 @@ import {
   runGameTransaction,
   setGameInviteCode,
   updateGameAfterMove,
+  type GameStatus,
   type GameResult,
   type GameRow,
   type PlayerColor,
 } from "../db/repositories/gameRepository.js";
-import { countMovesForGame, insertMove, listMovesForGame, type MoveRow } from "../db/repositories/moveRepository.js";
+import { countMovesForGame, findLatestMoveForGame, insertMove, listMovesForGame, type MoveRow } from "../db/repositories/moveRepository.js";
+import { applyLegalUciMove } from "../chess/chessRules.js";
 import { isBasicUciMove, normalizeUciMove } from "../chess/moveFormat.js";
 import { badRequest, conflict, forbidden, notFound } from "../http/apiError.js";
 
 const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+const DEBUG_MOVES = process.env.CAT_CHESS_DEBUG_MOVES === "1";
 
 export interface DeviceSession {
   deviceSecret: string;
@@ -36,6 +39,7 @@ export interface GameDto {
   boardFen: string;
   sideToMove: PlayerColor;
   yourColor: PlayerColor | null;
+  lastMove: string | null;
   createdAt: number;
   updatedAt: number;
   startedAt: number | null;
@@ -192,14 +196,32 @@ export function makeMove(gameId: number, deviceSecret: string, rawUci: string): 
       throw forbidden("not_your_turn");
     }
 
+    const moveResult = applyLegalUciMove(game.board_fen, uci);
+
+    if (!moveResult) {
+      throw badRequest("illegal_move");
+    }
+
     const moveIndex = countMovesForGame(gameId);
-    const nextSideToMove: PlayerColor = color === "white" ? "black" : "white";
+    const result: GameResult | null =
+      moveResult.status === "checkmate" ? (color === "white" ? "white_won" : "black_won") : moveResult.status === "stalemate" ? "draw" : null;
+    const status: GameStatus = moveResult.status === "active" ? "active" : "finished";
+    const finishedAt = status === "finished" ? now : null;
 
-    // TODO: replace with real FEN update after chess rules are implemented.
-    const fenAfter = game.board_fen;
+    insertMove(gameId, moveIndex, color, uci, moveResult.fen, now);
+    updateGameAfterMove(gameId, moveResult.fen, moveResult.sideToMove, status, result, finishedAt, now);
 
-    insertMove(gameId, moveIndex, color, uci, fenAfter, now);
-    updateGameAfterMove(gameId, nextSideToMove, now);
+    if (DEBUG_MOVES) {
+      console.info("[cat-chess] move", {
+        gameId,
+        color,
+        uci,
+        oldBoardFen: game.board_fen,
+        newBoardFen: moveResult.fen,
+        oldSideToMove: game.side_to_move,
+        newSideToMove: moveResult.sideToMove,
+      });
+    }
 
     const updatedGame = findGameById(gameId);
 
@@ -267,6 +289,7 @@ function toGameDto(row: GameRow, yourColor: PlayerColor | null): GameDto {
     boardFen: row.board_fen,
     sideToMove: row.side_to_move,
     yourColor,
+    lastMove: findLatestMoveForGame(row.id)?.uci ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     startedAt: row.started_at,

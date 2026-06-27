@@ -37,6 +37,7 @@ describe("gameService", () => {
     expect(game.status).toBe("waiting_for_black");
     expect(game.yourColor).toBe("white");
     expect(game.sideToMove).toBe("white");
+    expect(game.lastMove).toBeNull();
     expect(game.inviteCode).toBeTruthy();
     expect(game.startedAt).toBeNull();
     expect(game.finishedAt).toBeNull();
@@ -251,11 +252,19 @@ describe("gameService", () => {
     expect(movedGame.id).toBe(createdGame.id);
     expect(movedGame.sideToMove).toBe("black");
     expect(movedGame.yourColor).toBe("white");
+    expect(movedGame.lastMove).toBe("e2e4");
+    expect(movedGame.boardFen).toBe("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+
+    const blackView = getGame(createdGame.id, black.deviceSecret);
+    expect(blackView.boardFen).toBe(movedGame.boardFen);
+    expect(blackView.sideToMove).toBe("black");
+    expect(blackView.yourColor).toBe("black");
+    expect(blackView.lastMove).toBe("e2e4");
 
     const moves = db
       .prepare(
         `
-    SELECT move_index, color, uci
+    SELECT move_index, color, uci, fen_after
     FROM moves
     WHERE game_id = ?
     ORDER BY move_index ASC
@@ -265,6 +274,7 @@ describe("gameService", () => {
       move_index: number;
       color: string;
       uci: string;
+      fen_after: string;
     }>;
 
     expect(moves).toHaveLength(1);
@@ -272,6 +282,7 @@ describe("gameService", () => {
       move_index: 0,
       color: "white",
       uci: "e2e4",
+      fen_after: movedGame.boardFen,
     });
   });
 
@@ -286,11 +297,18 @@ describe("gameService", () => {
     const movedGame = makeMove(createdGame.id, black.deviceSecret, "e7e5");
 
     expect(movedGame.sideToMove).toBe("white");
+    expect(movedGame.lastMove).toBe("e7e5");
+    expect(movedGame.boardFen).toBe("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2");
+
+    const whiteView = getGame(createdGame.id, white.deviceSecret);
+    expect(whiteView.boardFen).toBe(movedGame.boardFen);
+    expect(whiteView.sideToMove).toBe("white");
+    expect(whiteView.lastMove).toBe("e7e5");
 
     const moves = db
       .prepare(
         `
-    SELECT move_index, color, uci
+    SELECT move_index, color, uci, fen_after
     FROM moves
     WHERE game_id = ?
     ORDER BY move_index ASC
@@ -300,6 +318,7 @@ describe("gameService", () => {
       move_index: number;
       color: string;
       uci: string;
+      fen_after: string;
     }>;
 
     expect(moves).toHaveLength(2);
@@ -307,6 +326,7 @@ describe("gameService", () => {
       move_index: 1,
       color: "black",
       uci: "e7e5",
+      fen_after: movedGame.boardFen,
     });
   });
 
@@ -345,6 +365,22 @@ describe("gameService", () => {
     }).toThrow("invalid_move_format");
   });
 
+  it("rejects illegal chess moves", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    expect(() => {
+      makeMove(createdGame.id, white.deviceSecret, "e2e5");
+    }).toThrow("illegal_move");
+
+    const game = getGame(createdGame.id, white.deviceSecret);
+    expect(game.boardFen).toBe("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    expect(game.sideToMove).toBe("white");
+  });
+
   it("does not allow move before game is active", () => {
     const white = createOrTouchDevice();
     const createdGame = createGame(white.deviceSecret);
@@ -363,6 +399,20 @@ describe("gameService", () => {
 
     expect(() => {
       makeMove(createdGame.id, black.deviceSecret, "e7e5");
+    }).toThrow("not_your_turn");
+  });
+
+  it("does not allow the same side to move twice", () => {
+    const white = createOrTouchDevice();
+    const black = createOrTouchDevice();
+
+    const createdGame = createGame(white.deviceSecret);
+    joinGame(createdGame.inviteCode!, black.deviceSecret);
+
+    makeMove(createdGame.id, white.deviceSecret, "e2e4");
+
+    expect(() => {
+      makeMove(createdGame.id, white.deviceSecret, "d2d4");
     }).toThrow("not_your_turn");
   });
 

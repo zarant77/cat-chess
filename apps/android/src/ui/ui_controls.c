@@ -2,15 +2,13 @@
 
 #include <stdio.h>
 
-#define UI_COLOR_PANEL 0x293241ee
-#define UI_COLOR_PANEL_BORDER 0xf2cc8fff
 #define UI_COLOR_BUTTON 0x3d405bff
 #define UI_COLOR_BUTTON_BORDER 0x81b29aff
-#define UI_COLOR_TEXT 0xffffffff
 #define UI_COLOR_TEXT_SHADOW 0x00000099
 #define UI_COLOR_SLIDER_TRACK 0x111827ff
 #define UI_COLOR_SLIDER_FILL 0x81b29aff
 #define UI_COLOR_SLIDER_HANDLE 0xf4f1deff
+#define UI_COLOR_PANEL_BORDER 0x8aa996ffu
 #define UI_PANEL_BORDER_SIZE 4
 #define UI_BUTTON_BORDER_SIZE 3
 #define UI_SLIDER_TRACK_HEIGHT 14
@@ -41,9 +39,62 @@ static int ui_text_width(const PackedFont* font, int scale, const char* text)
     return font_measure_text(font, scale, text);
 }
 
-static int ui_min_int(int a, int b)
+int ui_min_int(int a, int b)
 {
     return a < b ? a : b;
+}
+
+int ui_max_int(int a, int b)
+{
+    return a > b ? a : b;
+}
+
+int ui_content_width(int screen_width)
+{
+    int width = screen_width - UI_SPACE_LG * 2;
+    if (width > 620)
+    {
+        width = 620;
+    }
+    if (width < 280)
+    {
+        width = screen_width - UI_SPACE_MD * 2;
+    }
+    return width;
+}
+
+int ui_top_safe_padding(int screen_height)
+{
+    return ui_max_int(24, (screen_height * 6) / 100);
+}
+
+int ui_bottom_safe_padding(int screen_height)
+{
+    return ui_max_int(24, (screen_height * 4) / 100);
+}
+
+int ui_centered_group_y(int screen_height, int content_height)
+{
+    int top = ui_top_safe_padding(screen_height);
+    int bottom = ui_bottom_safe_padding(screen_height);
+    int available = screen_height - top - bottom;
+
+    if (available < content_height)
+    {
+        return top;
+    }
+
+    return top + (available - content_height) / 2;
+}
+
+UiRect ui_centered_rect(int screen_width, int y, int width, int height)
+{
+    UiRect rect;
+    rect.width = width;
+    rect.height = height;
+    rect.x = (screen_width - width) / 2;
+    rect.y = y;
+    return rect;
 }
 
 static void ui_draw_rect_outline(Framebuffer* framebuffer, UiRect rect, int thickness, uint32_t color)
@@ -97,8 +148,15 @@ void ui_draw_panel(Framebuffer* framebuffer, UiRect rect)
         return;
     }
 
-    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, UI_COLOR_PANEL);
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, UI_COLOR_PANEL_DARK);
     ui_draw_rect_outline(framebuffer, rect, UI_PANEL_BORDER_SIZE, UI_COLOR_PANEL_BORDER);
+}
+
+void ui_draw_card(Framebuffer* framebuffer, UiRect rect)
+{
+    renderer_draw_color_rect(framebuffer, rect.x + 4, rect.y + 4, rect.width, rect.height, 0x26324422u);
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, UI_COLOR_PANEL);
+    ui_draw_rect_outline(framebuffer, rect, 3, UI_COLOR_PANEL_BORDER);
 }
 
 void ui_draw_nine_slice_panel(
@@ -343,7 +401,7 @@ void ui_draw_button_colored(
     text_x = rect.x + (rect.width - text_width) / 2;
     text_y = rect.y + (rect.height - text_height) / 2;
 
-    ui_draw_label(framebuffer, font, text_x, text_y, scale, UI_COLOR_TEXT, label);
+    ui_draw_label(framebuffer, font, text_x, text_y, scale, UI_COLOR_TEXT_ON_DARK, label);
 }
 
 void ui_draw_button_scaled(
@@ -372,7 +430,199 @@ void ui_draw_button_scaled(
     text_x = rect.x + (rect.width - text_width) / 2;
     text_y = rect.y + (rect.height - text_height) / 2;
 
-    ui_draw_label(framebuffer, font, text_x, text_y, scale, UI_COLOR_TEXT, label);
+    ui_draw_label(framebuffer, font, text_x, text_y, scale, UI_COLOR_TEXT_ON_DARK, label);
+}
+
+void ui_draw_button_style(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect rect,
+        const char* label,
+        UiButtonStyle style,
+        int scale
+)
+{
+    uint32_t fill = 0x263244ffu;
+    uint32_t border = UI_COLOR_ACCENT;
+    uint32_t text = UI_COLOR_TEXT_ON_DARK;
+    int border_size = 4;
+    int max_text_width;
+    int text_width;
+    int text_height;
+    int text_x;
+    int text_y;
+
+    if (style == UI_BUTTON_SECONDARY)
+    {
+        fill = 0x3d4f5effu;
+        border = 0x8aa996ffu;
+    }
+    else if (style == UI_BUTTON_COMPACT)
+    {
+        fill = 0xf9f1e1ffu;
+        border = 0x263244ffu;
+        text = UI_COLOR_TEXT;
+        border_size = 3;
+    }
+    else if (style == UI_BUTTON_DANGER)
+    {
+        fill = UI_COLOR_ERROR;
+        border = UI_COLOR_ACCENT;
+    }
+    else if (style == UI_BUTTON_DISABLED)
+    {
+        fill = 0x8d9a94ffu;
+        border = 0xb5c7bdffu;
+        text = 0xeff4efffu;
+    }
+    else if (style == UI_BUTTON_SELECTED)
+    {
+        fill = 0x4a665affu;
+        border = UI_COLOR_ACCENT;
+    }
+
+    renderer_draw_color_rect(framebuffer, rect.x + 3, rect.y + 4, rect.width, rect.height, 0x26324433u);
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, fill);
+    ui_draw_rect_outline(framebuffer, rect, border_size, border);
+
+    if (font == 0 || label == 0)
+    {
+        return;
+    }
+
+    max_text_width = rect.width - UI_SPACE_MD * 2;
+    while (scale > 1 && ui_text_width(font, scale, label) > max_text_width)
+    {
+        scale -= 1;
+    }
+
+    text_width = ui_text_width(font, scale, label);
+    text_height = (int)font->grid_size * scale;
+    text_x = rect.x + (rect.width - text_width) / 2;
+    text_y = rect.y + (rect.height - text_height) / 2;
+    ui_draw_label(framebuffer, font, text_x, text_y, scale, text, label);
+}
+
+void ui_draw_centered_label(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        int screen_width,
+        int y,
+        int scale,
+        uint32_t color,
+        const char* label
+)
+{
+    int width;
+
+    if (font == 0 || label == 0)
+    {
+        return;
+    }
+
+    width = font_measure_text(font, scale, label);
+    ui_draw_label(framebuffer, font, (screen_width - width) / 2, y, scale, color, label);
+}
+
+void ui_draw_screen_background(Framebuffer* framebuffer)
+{
+    renderer_fill_vertical_gradient(framebuffer, UI_COLOR_BG_TOP, UI_COLOR_BG_BOTTOM);
+}
+
+void ui_draw_screen_title(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        int screen_width,
+        int y,
+        const char* title
+)
+{
+    int scale = screen_width < 420 ? 3 : 4;
+    ui_draw_centered_label(framebuffer, font, screen_width, y, scale, UI_COLOR_TEXT, title);
+}
+
+void ui_draw_status_pill(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect rect,
+        const char* label,
+        uint32_t color
+)
+{
+    int scale = 2;
+    int width;
+    int y;
+
+    renderer_draw_color_rect(framebuffer, rect.x, rect.y, rect.width, rect.height, 0xf9f1e1eeu);
+    ui_draw_rect_outline(framebuffer, rect, 3, color);
+    if (font == 0 || label == 0)
+    {
+        return;
+    }
+    while (scale > 1 && font_measure_text(font, scale, label) > rect.width - UI_SPACE_MD * 2)
+    {
+        scale -= 1;
+    }
+    width = font_measure_text(font, scale, label);
+    y = rect.y + (rect.height - (int)font->grid_size * scale) / 2;
+    ui_draw_label(framebuffer, font, rect.x + (rect.width - width) / 2, y, scale, color, label);
+}
+
+void ui_draw_input_field(
+        Framebuffer* framebuffer,
+        const PackedFont* font,
+        UiRect rect,
+        const char* label,
+        const char* value,
+        int focused
+)
+{
+    int value_scale = 3;
+    int label_width;
+    int value_width;
+    int value_y;
+    const char* safe_value = value == 0 || value[0] == '\0' ? "-" : value;
+
+    if (label != 0 && font != 0)
+    {
+        label_width = font_measure_text(font, 2, label);
+        ui_draw_label(framebuffer, font, rect.x + (rect.width - label_width) / 2, rect.y - 42, 2, UI_COLOR_TEXT_MUTED, label);
+    }
+
+    ui_draw_card(framebuffer, rect);
+    if (font == 0)
+    {
+        return;
+    }
+
+    while (value_scale > 1 && font_measure_text(font, value_scale, safe_value) > rect.width - UI_SPACE_MD * 2)
+    {
+        value_scale -= 1;
+    }
+    value_width = font_measure_text(font, value_scale, safe_value);
+    value_y = rect.y + (rect.height - (int)font->grid_size * value_scale) / 2;
+    ui_draw_label(
+            framebuffer,
+            font,
+            rect.x + (rect.width - value_width) / 2,
+            value_y,
+            value_scale,
+            focused ? UI_COLOR_TEXT : UI_COLOR_TEXT_MUTED,
+            safe_value
+    );
+}
+
+void ui_draw_cat_mark(Framebuffer* framebuffer, int center_x, int y, int scale)
+{
+    int size = 10 * scale;
+    int ear = 5 * scale;
+    int x = center_x - size / 2;
+
+    renderer_draw_color_rect(framebuffer, x, y + ear, size, size, UI_COLOR_TEXT);
+    renderer_draw_color_rect(framebuffer, x - ear, y + ear, ear, ear, UI_COLOR_TEXT);
+    renderer_draw_color_rect(framebuffer, x + size, y + ear, ear, ear, UI_COLOR_TEXT);
+    renderer_draw_color_rect(framebuffer, x + 2 * scale, y + size + ear - 3 * scale, 2 * scale, 2 * scale, UI_COLOR_ACCENT);
+    renderer_draw_color_rect(framebuffer, x + size - 4 * scale, y + size + ear - 3 * scale, 2 * scale, 2 * scale, UI_COLOR_ACCENT);
 }
 
 void ui_draw_slider(

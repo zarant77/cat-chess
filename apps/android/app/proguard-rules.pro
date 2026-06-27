@@ -21,5 +21,17 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class com.catemup.catchess.HttpClient {
-    public static java.lang.String request(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+    public static java.lang.String request(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int);
+}
+
+-keep class com.catemup.catchess.SoftKeyboard {
+    public static void show(android.app.Activity);
+    public static java.lang.String takePendingText();
+    public static int takePendingBackspaces();
+}
+
+-keep class com.catemup.catchess.CatChessAudio {
+    public static void play(java.lang.String, int);
+    public static void playMusicPcm(java.lang.String, short[], int, int, int, int);
+    public static void stopMusic();
 }

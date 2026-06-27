@@ -226,6 +226,7 @@ int cat_chess_json_parse_game(const char* json, CatChessGameDto* out_game) {
     if (!cat_chess_json_get_string(json, "boardFen", out_game->board_fen, sizeof(out_game->board_fen))) {
         return 0;
     }
+    cat_chess_json_get_string(json, "lastMove", out_game->last_move, sizeof(out_game->last_move));
     if (!cat_chess_json_get_string(json, "sideToMove", side_to_move, sizeof(side_to_move))) {
         return 0;
     }

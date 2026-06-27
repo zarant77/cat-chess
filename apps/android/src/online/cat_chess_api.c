@@ -3,13 +3,27 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <android/log.h>
+
+#include "../cat_chess_network_config.h"
 #include "../chess/chess_board.h"
+#include "../config.h"
 #include "cat_chess_json.h"
 
 #define CAT_CHESS_HTTP_RESPONSE_MAX 8192
 #define CAT_CHESS_HTTP_BODY_MAX 6144
 #define CAT_CHESS_URL_MAX 256
 #define CAT_CHESS_REQUEST_BODY_MAX 256
+
+#ifndef CAT_CHESS_DEBUG_NETWORK
+#define CAT_CHESS_DEBUG_NETWORK 0
+#endif
+
+#if CAT_CHESS_DEBUG_NETWORK
+#define API_LOG(...) __android_log_print(ANDROID_LOG_INFO, CAT_CHESS_LOG_TAG, __VA_ARGS__)
+#else
+#define API_LOG(...) ((void)0)
+#endif
 
 static JavaVM* api_java_vm;
 static jclass api_http_client_class;
@@ -122,7 +136,7 @@ void cat_chess_api_bind_android(JavaVM* vm, jobject activity) {
             env,
             api_http_client_class,
             "request",
-            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;"
     );
 }
 
@@ -138,6 +152,8 @@ void cat_chess_api_init(CatChessApiClient* client, const char* base_url) {
         strncpy(client->base_url, base_url, sizeof(client->base_url) - 1u);
         client->base_url[sizeof(client->base_url) - 1u] = '\0';
     }
+
+    API_LOG("online api base_url=%s timeout_ms=%d", client->base_url, CAT_CHESS_HTTP_TIMEOUT_MS);
 }
 
 void cat_chess_api_set_device_secret(CatChessApiClient* client, const char* device_secret) {
@@ -227,7 +243,8 @@ static int api_http_request(
             method_string,
             url_string,
             body_string,
-            secret_string
+            secret_string,
+            CAT_CHESS_HTTP_TIMEOUT_MS
     );
 
     if ((*env)->ExceptionCheck(env)) {
@@ -313,6 +330,7 @@ static CatChessApiStatus api_request(
         api_copy_error(&status, error_code);
     }
 
+    API_LOG("http %s %s status=%d result=%d error=%s", method, path, status.http_status, status.result, status.error_code);
     return status;
 }
 

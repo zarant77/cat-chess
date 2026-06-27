@@ -57,3 +57,17 @@ export function listMovesForGame(gameId: number): MoveRow[] {
     )
     .all(gameId) as MoveRow[];
 }
+
+export function findLatestMoveForGame(gameId: number): MoveRow | undefined {
+  return db
+    .prepare(
+      `
+      SELECT *
+      FROM moves
+      WHERE game_id = ?
+      ORDER BY move_index DESC
+      LIMIT 1
+    `,
+    )
+    .get(gameId) as MoveRow | undefined;
+}

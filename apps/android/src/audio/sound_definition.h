@@ -1,0 +1,11 @@
+#ifndef CAT_CHESS_SOUND_DEFINITION_H
+#define CAT_CHESS_SOUND_DEFINITION_H
+
+typedef enum {
+    SOUND_WAVE_SQUARE = 0,
+    SOUND_WAVE_SINE = 1,
+    SOUND_WAVE_TRIANGLE = 2,
+    SOUND_WAVE_NOISE = 3
+} SoundWaveKind;
+
+#endif

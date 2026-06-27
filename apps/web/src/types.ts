@@ -10,6 +10,7 @@ export interface GameDto {
   boardFen: string;
   sideToMove: PlayerColor;
   yourColor: PlayerColor | null;
+  lastMove: string | null;
   createdAt: number;
   updatedAt: number;
   startedAt: number | null;

@@ -1,6 +1,0 @@
-#ifndef CAT_CHESS_API_CONFIG_H
-#define CAT_CHESS_API_CONFIG_H
-
-#define CAT_CHESS_API_BASE_URL "http://10.0.2.2:5400"
-
-#endif

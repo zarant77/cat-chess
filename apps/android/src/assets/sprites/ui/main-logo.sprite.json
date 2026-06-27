@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "id": "main-logo",
+  "width": 256,
+  "height": 128,
+  "pivotX": 128,
+  "pivotY": 64,
+  "primitives": [
+    {
+      "kind": "rect",
+      "x": 128,
+      "y": 72,
+      "w": 132,
+      "h": 54,
+      "rotation": 0,
+      "color": "263244ff"
+    },
+    {
+      "kind": "rect",
+      "x": 128,
+      "y": 78,
+      "w": 118,
+      "h": 38,
+      "rotation": 0,
+      "color": "f9f1e1ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 80,
+      "y": 39,
+      "w": 38,
+      "h": 42,
+      "rotation": 224,
+      "color": "263244ff"
+    },
+    {
+      "kind": "triangle",
+      "x": 176,
+      "y": 39,
+      "w": 38,
+      "h": 42,
+      "rotation": 32,
+      "color": "263244ff"
+    },
+    {
+      "kind": "circle",
+      "x": 102,
+      "y": 62,
+      "w": 12,
+      "h": 12,
+      "rotation": 0,
+      "color": "f4c542ff"
+    },
+    {
+      "kind": "circle",
+      "x": 154,
+      "y": 62,
+      "w": 12,
+      "h": 12,
+      "rotation": 0,
+      "color": "f4c542ff"
+    },
+    {
+      "kind": "rect",
+      "x": 128,
+      "y": 82,
+      "w": 18,
+      "h": 6,
+      "rotation": 0,
+      "color": "263244ff"
+    },
+    {
+      "kind": "rect",
+      "x": 92,
+      "y": 91,
+      "w": 36,
+      "h": 5,
+      "rotation": 246,
+      "color": "263244ff"
+    },
+    {
+      "kind": "rect",
+      "x": 164,
+      "y": 91,
+      "w": 36,
+      "h": 5,
+      "rotation": 10,
+      "color": "263244ff"
+    },
+    {
+      "kind": "rect",
+      "x": 128,
+      "y": 110,
+      "w": 146,
+      "h": 8,
+      "rotation": 0,
+      "color": "81b29aff"
+    },
+    {
+      "kind": "rect",
+      "x": 64,
+      "y": 110,
+      "w": 14,
+      "h": 24,
+      "rotation": 0,
+      "color": "263244ff"
+    },
+    {
+      "kind": "rect",
+      "x": 192,
+      "y": 110,
+      "w": 14,
+      "h": 24,
+      "rotation": 0,
+      "color": "263244ff"
+    },
+    {
+      "kind": "rect",
+      "x": 128,
+      "y": 24,
+      "w": 178,
+      "h": 10,
+      "rotation": 0,
+      "color": "3d405bff"
+    }
+  ]
+}

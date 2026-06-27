@@ -10,17 +10,8 @@
       "kind": "rect",
       "x": 48,
       "y": 32,
-      "w": 96,
-      "h": 64,
-      "rotation": 0,
-      "color": "f4f1deff"
-    },
-    {
-      "kind": "rect",
-      "x": 48,
-      "y": 32,
       "w": 88,
-      "h": 52,
+      "h": 58,
       "rotation": 0,
       "color": "ffffffff"
     },
@@ -29,7 +20,7 @@
       "x": 48,
       "y": 32,
       "w": 14,
-      "h": 52,
+      "h": 56,
       "rotation": 0,
       "color": "cf142bff"
     },
@@ -44,8 +35,8 @@
     },
     {
       "kind": "rect",
-      "x": 48,
-      "y": 4,
+      "x": 47,
+      "y": 2,
       "w": 96,
       "h": 4,
       "rotation": 0,

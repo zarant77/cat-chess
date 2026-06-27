@@ -4,6 +4,8 @@ project(cat_chess C)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
+option(CAT_CHESS_AI_TUNING "Build Cat Chess AI tuning harness" OFF)
+
 set(CAT_CHESS_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../..)
 set(CAT_CHESS_FONT_OUTPUTS
     ${CAT_CHESS_ROOT}/src/fonts/fonts_packed.c
@@ -13,12 +15,19 @@ set(CAT_CHESS_SPRITE_OUTPUTS
     ${CAT_CHESS_ROOT}/src/sprites/definitions/sprites_packed.c
     ${CAT_CHESS_ROOT}/src/sprites/definitions/sprites_packed.h
 )
+set(CAT_CHESS_MUSIC_OUTPUTS
+    ${CAT_CHESS_ROOT}/src/audio/generated_music.c
+    ${CAT_CHESS_ROOT}/src/audio/generated_music.h
+)
 
 file(GLOB_RECURSE CAT_CHESS_FONT_ASSETS CONFIGURE_DEPENDS
     ${CAT_CHESS_ROOT}/src/assets/fonts/*.font.json
 )
 file(GLOB_RECURSE CAT_CHESS_SPRITE_ASSETS CONFIGURE_DEPENDS
     ${CAT_CHESS_ROOT}/src/assets/sprites/*.json
+)
+file(GLOB_RECURSE CAT_CHESS_MUSIC_ASSETS CONFIGURE_DEPENDS
+    ${CAT_CHESS_ROOT}/src/assets/music/*.music.json
 )
 
 add_custom_command(
@@ -45,14 +54,31 @@ add_custom_command(
 
 add_custom_target(pack_sprites DEPENDS ${CAT_CHESS_SPRITE_OUTPUTS})
 
+add_custom_command(
+    OUTPUT ${CAT_CHESS_MUSIC_OUTPUTS}
+    COMMAND ${Python3_EXECUTABLE} ${CAT_CHESS_ROOT}/tools/pack_music.py
+    DEPENDS
+        ${CAT_CHESS_ROOT}/tools/pack_music.py
+        ${CAT_CHESS_MUSIC_ASSETS}
+    WORKING_DIRECTORY ${CAT_CHESS_ROOT}
+    COMMENT "Packing procedural music"
+)
+
+add_custom_target(pack_music DEPENDS ${CAT_CHESS_MUSIC_OUTPUTS})
+
 add_library(cat_chess SHARED
     ../../../../src/app/app.c
+    ../../../../src/audio/audio.c
     ../../../../src/audio/chess_sound.c
+    ../../../../src/audio/generated_music.c
+    ../../../../src/audio/music_generator.c
+    ../../../../src/audio/music_registry.c
     ../../../../src/chess/chess_ai.c
     ../../../../src/chess/chess_board.c
     ../../../../src/chess/chess_fen.c
     ../../../../src/chess/chess_game.c
     ../../../../src/chess/chess_move.c
+    ../../../../src/chess/chess_move_log.c
     ../../../../src/chess/chess_rules.c
     ../../../../src/fonts/font_renderer.c
     ../../../../src/fonts/fonts_packed.c
@@ -70,6 +96,7 @@ add_library(cat_chess SHARED
     ../../../../src/sprites/definitions/sprites_packed.c
     ../../../../src/sprites/generated_sprite.c
     ../../../../src/ui/chess_board_view.c
+    ../../../../src/ui/chess_move_log_view.c
     ../../../../src/ui/chess_piece_view.c
     ../../../../src/ui/screens/screen_create_game.c
     ../../../../src/ui/screens/screen_game.c
@@ -77,14 +104,34 @@ add_library(cat_chess SHARED
     ../../../../src/ui/screens/screen_join_game.c
     ../../../../src/ui/screens/screen_local_game.c
     ../../../../src/ui/screens/screen_my_games.c
+    ../../../../src/ui/screens/screen_online.c
     ../../../../src/ui/screens/screen_settings.c
     ../../../../src/ui/ui_controls.c
 )
 
-add_dependencies(cat_chess pack_fonts pack_sprites)
+add_dependencies(cat_chess pack_fonts pack_sprites pack_music)
 
 target_include_directories(cat_chess PRIVATE
     ../../../../src
 )
 
 target_link_libraries(cat_chess android log)
+
+if(CAT_CHESS_AI_TUNING)
+    add_executable(cat_chess_ai_tuning
+        ../../../../src/chess/chess_ai.c
+        ../../../../src/chess/chess_ai_tuning.c
+        ../../../../src/chess/chess_board.c
+        ../../../../src/chess/chess_fen.c
+        ../../../../src/chess/chess_move.c
+        ../../../../src/chess/chess_rules.c
+    )
+    target_include_directories(cat_chess_ai_tuning PRIVATE
+        ../../../../src
+    )
+    target_compile_definitions(cat_chess_ai_tuning PRIVATE
+        CAT_CHESS_AI_TUNING=1
+        CAT_CHESS_AI_TUNING_LOG=1
+        CAT_CHESS_AI_TUNING_MAIN=1
+    )
+endif()

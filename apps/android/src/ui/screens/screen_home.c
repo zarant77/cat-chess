@@ -4,99 +4,120 @@
 #include "../../localization/localization.h"
 #include "../ui_controls.h"
 
-#define HOME_BUTTON_COUNT 5
-#define HOME_BUTTON_FONT_SCALE 3
-#define HOME_BUTTON_HEIGHT 112
-#define HOME_BUTTON_GAP 22
-#define HOME_TITLE_MIN_Y 36
-#define HOME_TITLE_MAX_Y 72
-#define HOME_TITLE_BUTTON_GAP 48
-#define HOME_BOTTOM_MARGIN 20
+#define HOME_BUTTON_COUNT 4
+#define HOME_LOGO_ID "main-logo"
 
-static int screen_home_clamp_int(int value, int min_value, int max_value) {
-    if (value < min_value) {
-        return min_value;
+static int screen_home_primary_height(const AppState* app) {
+    if (app->screenHeight < 640) {
+        return 88;
     }
-    if (value > max_value) {
-        return max_value;
+    if (app->screenHeight < 760) {
+        return 102;
     }
-    return value;
+    return 124;
 }
 
-static int screen_home_title_scale(const AppState* app) {
-    return app->screenWidth < 420 ? 3 : 4;
+static int screen_home_secondary_height(const AppState* app) {
+    if (app->screenHeight < 640) {
+        return 76;
+    }
+    if (app->screenHeight < 760) {
+        return 88;
+    }
+    return 108;
 }
 
-static int screen_home_title_y(const AppState* app) {
-    return screen_home_clamp_int(app->screenHeight / 12, HOME_TITLE_MIN_Y, HOME_TITLE_MAX_Y);
+static int screen_home_button_gap(const AppState* app) {
+    return app->screenHeight < 640 ? UI_SPACE_SM : UI_SPACE_MD;
 }
 
-static int screen_home_buttons_start_y(const AppState* app) {
-    int title_scale = screen_home_title_scale(app);
-    int title_height = 16 * title_scale;
-    int min_start_y = screen_home_title_y(app) + title_height + HOME_TITLE_BUTTON_GAP;
-    int total_height = HOME_BUTTON_COUNT * HOME_BUTTON_HEIGHT
-            + (HOME_BUTTON_COUNT - 1) * HOME_BUTTON_GAP;
-    int available_height = app->screenHeight - min_start_y - HOME_BOTTOM_MARGIN;
+static UiRect screen_home_logo_rect(const AppState* app) {
+    UiRect rect;
+    int max_width = ui_content_width(app->screenWidth);
+    int width = ui_min_int(max_width, app->screenWidth < 420 ? 230 : 280);
+    int height = (width * 128) / 256;
 
-    if (available_height > total_height) {
-        return min_start_y + (available_height - total_height) / 2;
+    if (height > app->screenHeight / 6) {
+        height = app->screenHeight / 6;
+        width = (height * 256) / 128;
     }
 
-    return min_start_y;
+    rect.width = width;
+    rect.height = height;
+    rect.x = (app->screenWidth - width) / 2;
+    rect.y = ui_centered_group_y(
+            app->screenHeight,
+            height + UI_SPACE_LG
+                    + screen_home_primary_height(app) * 2
+                    + screen_home_secondary_height(app) * 2
+                    + screen_home_button_gap(app) * 2
+                    + (app->screenHeight < 640 ? UI_SPACE_XS : UI_SPACE_SM) * 2
+    );
+    return rect;
 }
 
 static UiRect screen_home_button_rect(const AppState* app, int index) {
-    int width = app->screenWidth - 64;
-    int max_width = 760;
-    int start_y = screen_home_buttons_start_y(app);
-    UiRect rect;
+    int width = ui_content_width(app->screenWidth);
+    UiRect logo = screen_home_logo_rect(app);
+    int primary_height = screen_home_primary_height(app);
+    int secondary_height = screen_home_secondary_height(app);
+    int gap = screen_home_button_gap(app);
+    int small_gap = app->screenHeight < 640 ? UI_SPACE_XS : UI_SPACE_SM;
+    int total_height = primary_height * 2 + secondary_height * 2 + gap * 2 + small_gap * 2;
+    int start_y = logo.y + logo.height + UI_SPACE_LG;
+    int max_start_y = app->screenHeight - ui_bottom_safe_padding(app->screenHeight) - total_height;
+    int height = index < 2 ? primary_height : secondary_height;
+    int y = start_y;
 
-    if (width > max_width) {
-        width = max_width;
-    }
-    if (width < 280) {
-        width = 280;
+    if (start_y > max_start_y) {
+        start_y = ui_max_int(logo.y + logo.height + UI_SPACE_SM, max_start_y);
+        y = start_y;
     }
 
-    rect.x = (app->screenWidth - width) / 2;
-    rect.y = start_y + index * (HOME_BUTTON_HEIGHT + HOME_BUTTON_GAP);
-    rect.width = width;
-    rect.height = HOME_BUTTON_HEIGHT;
-    return rect;
+    if (index == 1) {
+        y += primary_height + gap;
+    } else if (index == 2) {
+        y += primary_height * 2 + gap * 2 + small_gap;
+    } else if (index == 3) {
+        y += primary_height * 2 + secondary_height + gap * 2 + small_gap * 2;
+    }
+
+    return ui_centered_rect(app->screenWidth, y, width, height);
 }
 
 void screen_home_render(Framebuffer* framebuffer, const AppState* app) {
     const PackedFont* font = font_registry_find("vector_16_basic");
+    const GeneratedSprite* logo = generated_sprite_get_by_id(HOME_LOGO_ID);
+    UiRect logo_rect = screen_home_logo_rect(app);
     const LocalizedTextId label_ids[HOME_BUTTON_COUNT] = {
             LOCALIZED_TEXT_LOCAL_GAME,
-            LOCALIZED_TEXT_CREATE_ONLINE_GAME,
-            LOCALIZED_TEXT_JOIN_ONLINE_GAME,
+            LOCALIZED_TEXT_ONLINE,
             LOCALIZED_TEXT_MY_GAMES,
             LOCALIZED_TEXT_SETTINGS
     };
-    const char* title = localization_text(app->settings.locale, LOCALIZED_TEXT_APP_NAME);
-    int title_scale = screen_home_title_scale(app);
-    int title_width = font_measure_text(font, title_scale, title);
-    int title_y = screen_home_title_y(app);
 
-    ui_draw_label(
-            framebuffer,
-            font,
-            (app->screenWidth - title_width) / 2,
-            title_y,
-            title_scale,
-            0x27312bffu,
-            title
-    );
+    if (logo != 0) {
+        renderer_draw_generated_sprite_fit(framebuffer, logo, logo_rect.x, logo_rect.y, logo_rect.width, logo_rect.height, SPRITE_FIT_CONTAIN);
+    } else {
+        ui_draw_centered_label(
+                framebuffer,
+                font,
+                app->screenWidth,
+                logo_rect.y + logo_rect.height / 3,
+                app->screenWidth < 420 ? 3 : 4,
+                UI_COLOR_TEXT,
+                localization_text(app->settings.locale, LOCALIZED_TEXT_APP_NAME)
+        );
+    }
 
     for (int index = 0; index < HOME_BUTTON_COUNT; ++index) {
-        ui_draw_button_scaled(
+        ui_draw_button_style(
                 framebuffer,
                 font,
                 screen_home_button_rect(app, index),
                 localization_text(app->settings.locale, label_ids[index]),
-                HOME_BUTTON_FONT_SCALE
+                index < 2 ? UI_BUTTON_PRIMARY : UI_BUTTON_SECONDARY,
+                app->screenHeight >= 760 && index < 2 ? 4 : 3
         );
     }
 }
@@ -115,13 +136,11 @@ void screen_home_handle_tap(AppState* app, int x, int y) {
         if (index == 0) {
             app_navigate(app, APP_SCREEN_LOCAL_GAME);
         } else if (index == 1) {
-            app_navigate(app, APP_SCREEN_CREATE_GAME);
+            app_navigate(app, APP_SCREEN_ONLINE);
         } else if (index == 2) {
-            app_navigate(app, APP_SCREEN_JOIN_GAME);
-        } else if (index == 3) {
             app_navigate(app, APP_SCREEN_MY_GAMES);
         } else {
-            app_navigate(app, APP_SCREEN_SETTINGS);
+            app_open_settings(app);
         }
         return;
     }

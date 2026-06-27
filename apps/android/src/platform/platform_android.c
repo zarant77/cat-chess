@@ -10,6 +10,7 @@
 
 #include "../config.h"
 #include "../app/app.h"
+#include "../audio/audio.h"
 #include "../input/input.h"
 #include "../online/cat_chess_api.h"
 #include "../renderer/renderer.h"
@@ -46,6 +47,204 @@ typedef struct AndroidPlatform {
 
 static AndroidPlatform* platform_from_activity(ANativeActivity* activity) {
     return (AndroidPlatform*)activity->instance;
+}
+
+static JNIEnv* platform_get_jni_env(ANativeActivity* activity, int* did_attach) {
+    JNIEnv* env = NULL;
+
+    if (did_attach != NULL) {
+        *did_attach = 0;
+    }
+    if (activity == NULL || activity->vm == NULL) {
+        return NULL;
+    }
+
+    if ((*activity->vm)->GetEnv(activity->vm, (void**)&env, JNI_VERSION_1_6) == JNI_OK) {
+        return env;
+    }
+
+    if ((*activity->vm)->AttachCurrentThread(activity->vm, &env, NULL) != JNI_OK) {
+        return NULL;
+    }
+    if (did_attach != NULL) {
+        *did_attach = 1;
+    }
+    return env;
+}
+
+static void platform_clear_jni_exception(JNIEnv* env) {
+    if (env != NULL && (*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+    }
+}
+
+static jclass platform_load_app_class(JNIEnv* env, jobject activity, const char* class_name_value) {
+    jclass activity_class;
+    jmethodID get_class_loader_method;
+    jobject class_loader;
+    jclass class_loader_class;
+    jmethodID load_class_method;
+    jstring class_name;
+    jclass loaded_class = NULL;
+
+    if (env == NULL || activity == NULL || class_name_value == NULL) {
+        return NULL;
+    }
+
+    activity_class = (*env)->GetObjectClass(env, activity);
+    if (activity_class == NULL) {
+        platform_clear_jni_exception(env);
+        return NULL;
+    }
+
+    get_class_loader_method = (*env)->GetMethodID(env, activity_class, "getClassLoader", "()Ljava/lang/ClassLoader;");
+    if (get_class_loader_method == NULL) {
+        platform_clear_jni_exception(env);
+        (*env)->DeleteLocalRef(env, activity_class);
+        return NULL;
+    }
+
+    class_loader = (*env)->CallObjectMethod(env, activity, get_class_loader_method);
+    (*env)->DeleteLocalRef(env, activity_class);
+    if (class_loader == NULL || (*env)->ExceptionCheck(env)) {
+        platform_clear_jni_exception(env);
+        return NULL;
+    }
+
+    class_loader_class = (*env)->FindClass(env, "java/lang/ClassLoader");
+    if (class_loader_class == NULL) {
+        platform_clear_jni_exception(env);
+        (*env)->DeleteLocalRef(env, class_loader);
+        return NULL;
+    }
+
+    load_class_method = (*env)->GetMethodID(env, class_loader_class, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+    if (load_class_method == NULL) {
+        platform_clear_jni_exception(env);
+        (*env)->DeleteLocalRef(env, class_loader_class);
+        (*env)->DeleteLocalRef(env, class_loader);
+        return NULL;
+    }
+
+    class_name = (*env)->NewStringUTF(env, class_name_value);
+    if (class_name != NULL) {
+        loaded_class = (jclass)(*env)->CallObjectMethod(env, class_loader, load_class_method, class_name);
+        (*env)->DeleteLocalRef(env, class_name);
+        if ((*env)->ExceptionCheck(env)) {
+            platform_clear_jni_exception(env);
+            loaded_class = NULL;
+        }
+    } else {
+        platform_clear_jni_exception(env);
+    }
+
+    (*env)->DeleteLocalRef(env, class_loader_class);
+    (*env)->DeleteLocalRef(env, class_loader);
+    return loaded_class;
+}
+
+static jclass platform_load_soft_keyboard_class(JNIEnv* env, ANativeActivity* activity) {
+    return platform_load_app_class(env, activity->clazz, "com.catemup.catchess.SoftKeyboard");
+}
+
+static void platform_poll_soft_keyboard_text(AndroidPlatform* platform) {
+    JNIEnv* env;
+    int did_attach = 0;
+    jclass keyboard_class;
+    jmethodID take_text_method;
+    jmethodID take_backspaces_method;
+    jstring text_string;
+    const char* text_chars;
+    jint backspaces;
+
+    if (platform == NULL || platform->activity == NULL || platform->activity->clazz == NULL) {
+        return;
+    }
+
+    env = platform_get_jni_env(platform->activity, &did_attach);
+    if (env == NULL) {
+        return;
+    }
+
+    keyboard_class = platform_load_soft_keyboard_class(env, platform->activity);
+    if (keyboard_class == NULL) {
+        goto cleanup;
+    }
+
+    take_text_method = (*env)->GetStaticMethodID(env, keyboard_class, "takePendingText", "()Ljava/lang/String;");
+    take_backspaces_method = (*env)->GetStaticMethodID(env, keyboard_class, "takePendingBackspaces", "()I");
+    if (take_text_method == NULL || take_backspaces_method == NULL) {
+        platform_clear_jni_exception(env);
+        goto cleanup_keyboard_class;
+    }
+
+    backspaces = (*env)->CallStaticIntMethod(env, keyboard_class, take_backspaces_method);
+    if ((*env)->ExceptionCheck(env)) {
+        platform_clear_jni_exception(env);
+        backspaces = 0;
+    }
+    for (jint index = 0; index < backspaces; ++index) {
+        input_handle_text_backspace(&platform->input);
+    }
+
+    text_string = (jstring)(*env)->CallStaticObjectMethod(env, keyboard_class, take_text_method);
+    if (text_string != NULL && !(*env)->ExceptionCheck(env)) {
+        text_chars = (*env)->GetStringUTFChars(env, text_string, NULL);
+        if (text_chars != NULL) {
+            for (int index = 0; text_chars[index] != '\0'; ++index) {
+                input_handle_text_char(&platform->input, text_chars[index]);
+            }
+            (*env)->ReleaseStringUTFChars(env, text_string, text_chars);
+        }
+        (*env)->DeleteLocalRef(env, text_string);
+    } else {
+        platform_clear_jni_exception(env);
+    }
+
+cleanup_keyboard_class:
+    (*env)->DeleteLocalRef(env, keyboard_class);
+cleanup:
+    if (did_attach) {
+        (*platform->activity->vm)->DetachCurrentThread(platform->activity->vm);
+    }
+}
+
+static int platform_show_soft_keyboard_java(ANativeActivity* activity) {
+    JNIEnv* env;
+    int did_attach = 0;
+    int shown = 0;
+    jclass keyboard_class;
+    jmethodID show_method;
+
+    if (activity == NULL || activity->clazz == NULL) {
+        return 0;
+    }
+
+    env = platform_get_jni_env(activity, &did_attach);
+    if (env == NULL) {
+        return 0;
+    }
+
+    keyboard_class = platform_load_soft_keyboard_class(env, activity);
+    if (keyboard_class == NULL) {
+        goto cleanup;
+    }
+
+    show_method = (*env)->GetStaticMethodID(env, keyboard_class, "show", "(Landroid/app/Activity;)V");
+    if (show_method != NULL) {
+        (*env)->CallStaticVoidMethod(env, keyboard_class, show_method, activity->clazz);
+        shown = !(*env)->ExceptionCheck(env);
+        platform_clear_jni_exception(env);
+    } else {
+        platform_clear_jni_exception(env);
+    }
+
+    (*env)->DeleteLocalRef(env, keyboard_class);
+cleanup:
+    if (did_attach) {
+        (*activity->vm)->DetachCurrentThread(activity->vm);
+    }
+    return shown;
 }
 
 static double platform_now_seconds(void) {
@@ -266,15 +465,20 @@ static int platform_draw(AndroidPlatform* platform, float dt) {
     }
 
     app_set_screen_size(&platform->app, (float)buffer.width, (float)buffer.height);
+    pthread_mutex_lock(&platform->input_queue_mutex);
+    platform_poll_soft_keyboard_text(platform);
     app_update(&platform->app, &platform->input, dt);
     should_show_keyboard = app_take_soft_keyboard_request(&platform->app);
     input_end_frame(&platform->input);
+    pthread_mutex_unlock(&platform->input_queue_mutex);
     renderer_draw_frame(&buffer, &platform->app);
     ANativeWindow_unlockAndPost(window);
     ANativeWindow_release(window);
 
     if (should_show_keyboard && platform->activity != NULL) {
-        ANativeActivity_showSoftInput(platform->activity, ANATIVEACTIVITY_SHOW_SOFT_INPUT_IMPLICIT);
+        if (!platform_show_soft_keyboard_java(platform->activity)) {
+            ANativeActivity_showSoftInput(platform->activity, ANATIVEACTIVITY_SHOW_SOFT_INPUT_IMPLICIT);
+        }
     }
 
     return 1;
@@ -460,6 +664,7 @@ static void platform_on_pause(ANativeActivity* activity) {
     pthread_mutex_lock(&platform->input_queue_mutex);
     input_handle_touch(&platform->input, INPUT_TOUCH_CANCEL, -1, 0.0f, 0.0f, 0.0f);
     pthread_mutex_unlock(&platform->input_queue_mutex);
+    audio_pause();
 }
 
 static void platform_on_resume(ANativeActivity* activity) {
@@ -471,6 +676,7 @@ static void platform_on_resume(ANativeActivity* activity) {
     pthread_mutex_lock(&platform->window_mutex);
     platform->reset_frame_time = 1;
     pthread_mutex_unlock(&platform->window_mutex);
+    audio_resume();
 }
 
 static void platform_on_destroy(ANativeActivity* activity) {
@@ -492,6 +698,7 @@ static void platform_on_destroy(ANativeActivity* activity) {
     pthread_mutex_destroy(&platform->input_queue_mutex);
     pthread_mutex_destroy(&platform->window_mutex);
     generated_sprite_shutdown_all();
+    audio_shutdown();
     activity->instance = NULL;
 
     free(platform);
@@ -519,6 +726,8 @@ void platform_android_on_create(
     pthread_mutex_init(&platform->input_queue_mutex, NULL);
     platform->reset_frame_time = 1;
 
+    audio_init();
+    audio_bind_android(activity->vm, activity->clazz);
     cat_chess_api_bind_android(activity->vm, activity->clazz);
     generated_sprite_initialize_all();
     local_storage_set_base_path(activity->internalDataPath);

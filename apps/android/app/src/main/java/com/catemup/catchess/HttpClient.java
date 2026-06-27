@@ -12,15 +12,16 @@ public final class HttpClient {
     private HttpClient() {
     }
 
-    public static String request(String method, String url, String body, String deviceSecret) {
+    public static String request(String method, String url, String body, String deviceSecret, int timeoutMs) {
         HttpURLConnection connection = null;
 
         try {
+            int effectiveTimeoutMs = Math.max(1, timeoutMs);
             URL target = new URL(url);
             connection = (HttpURLConnection)target.openConnection();
             connection.setRequestMethod(method);
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(effectiveTimeoutMs);
+            connection.setReadTimeout(effectiveTimeoutMs);
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 

@@ -9,7 +9,9 @@
 #include "../ui/screens/screen_join_game.h"
 #include "../ui/screens/screen_local_game.h"
 #include "../ui/screens/screen_my_games.h"
+#include "../ui/screens/screen_online.h"
 #include "../ui/screens/screen_settings.h"
+#include "../ui/ui_controls.h"
 
 static uint8_t rgba_r(uint32_t color) {
     return (uint8_t)((color >> 24) & 0xff);
@@ -346,14 +348,17 @@ void renderer_draw_generated_sprite_fit(
         SpriteFitMode fit_mode
 ) {
     renderer_fit_rect(sprite, &dst_x, &dst_y, &dst_width, &dst_height, fit_mode);
-    renderer_draw_generated_sprite_tinted(
+    renderer_draw_generated_sprite_region_scaled(
             framebuffer,
             sprite,
+            0,
+            0,
+            sprite != 0 ? sprite->width : 0,
+            sprite != 0 ? sprite->height : 0,
             dst_x,
             dst_y,
             dst_width,
-            dst_height,
-            0xffffffffu
+            dst_height
     );
 }
 
@@ -362,11 +367,13 @@ void renderer_draw_frame(ANativeWindow_Buffer* buffer, const AppState* app) {
         return;
     }
 
-    renderer_fill_vertical_gradient(buffer, 0xf5f0e7ffu, 0xb8d2c7ffu);
+    ui_draw_screen_background(buffer);
     if (app->currentScreen == APP_SCREEN_HOME) {
         screen_home_render(buffer, app);
     } else if (app->currentScreen == APP_SCREEN_LOCAL_GAME) {
         screen_local_game_render(buffer, app);
+    } else if (app->currentScreen == APP_SCREEN_ONLINE) {
+        screen_online_render(buffer, app);
     } else if (app->currentScreen == APP_SCREEN_CREATE_GAME) {
         screen_create_game_render(buffer, app);
     } else if (app->currentScreen == APP_SCREEN_JOIN_GAME) {

@@ -2,6 +2,8 @@
 #define CAT_CHESS_APP_STATE_H
 
 #include "../chess/chess_game.h"
+#include "../chess/chess_move_log.h"
+#include "../chess/chess_rules.h"
 #include "../online/cat_chess_api.h"
 #include "../online/online_game.h"
 #include "../settings/game_settings.h"
@@ -9,6 +11,7 @@
 typedef enum {
     APP_SCREEN_HOME = 0,
     APP_SCREEN_LOCAL_GAME,
+    APP_SCREEN_ONLINE,
     APP_SCREEN_CREATE_GAME,
     APP_SCREEN_JOIN_GAME,
     APP_SCREEN_MY_GAMES,
@@ -41,11 +44,30 @@ typedef enum {
     LOCAL_GAME_MESSAGE_DRAW
 } LocalGameMessage;
 
+#define LOCAL_GAME_HISTORY_MAX 128
+
+typedef struct {
+    ChessBoard board;
+    LocalGameMessage message;
+    int game_over;
+    int move_log_count;
+} LocalGameSnapshot;
+
 typedef struct {
     AppScreen currentScreen;
     ChessGame localGame;
+    ChessMoveAnimation localAnimation;
     LocalGameMessage localGameMessage;
     int localGameOver;
+    int localAiMovePending;
+    int localAiGeneration;
+    int localPendingAiGeneration;
+    LocalGameSnapshot localHistory[LOCAL_GAME_HISTORY_MAX];
+    int localHistoryCount;
+    ChessMoveLogEntry localMoveLog[CHESS_MOVE_LOG_MAX];
+    int localMoveLogCount;
+    int exitConfirmVisible;
+    AppScreen settingsReturnScreen;
     GameSettings settings;
     CatChessApiClient apiClient;
     OnlineGame onlineGame;
@@ -53,9 +75,14 @@ typedef struct {
     CatChessApiStatus lastApiStatus;
     char inviteCode[CAT_CHESS_INVITE_CODE_MAX];
     int inviteInputFocused;
+    int myGamesPage;
     int selectedSquare;
     int lastTappedSquare;
     int hasSelection;
+    ChessMoveList moveHints;
+    int promotionPickerVisible;
+    int promotionPickerOnline;
+    ChessMove pendingPromotionMove;
     DeviceSecretStatus deviceSecretStatus;
     NetworkStatus networkStatus;
     int screenWidth;
